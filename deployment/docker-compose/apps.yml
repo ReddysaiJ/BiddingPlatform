@@ -1,0 +1,64 @@
+name: 'bidding-spring-boot'
+services:
+  eureka:
+    image: reddysai21/bidding-eureka-server
+    container_name: eureka
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - MANAGEMENT_TRACING_ENABLED=true
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411/api/v2/spans
+    ports:
+      - "8761:8761"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    labels:
+      logging: "promtail"
+
+  api-gateway:
+    image: reddysai21/bidding-api-gateway
+    container_name: api-gateway
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - AUCTION_URL=http://host.docker.internal:8081
+      - BID_URL=http://host.docker.internal:8085
+      - OAUTH2_ISSUER_URI=http://keycloak:9191
+      - EUREKA_URL=http://eureka:8761/eureka
+      - MANAGEMENT_TRACING_ENABLED=true
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411/api/v2/spans
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    labels:
+      logging: "promtail"
+
+  auction:
+      image: reddysai21/bidding-auction
+      container_name: auction
+      environment:
+        - SPRING_PROFILES_ACTIVE=docker
+        - DB_URL=jdbc:postgresql://auction-db:5432/postgres
+        - DB_USERNAME=postgres
+        - DB_PASSWORD=1212
+        - MANAGEMENT_TRACING_ENABLED=true
+        - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411/api/v2/spans
+      ports:
+        - "8081:8081"
+      restart: unless-stopped
+      depends_on:
+        auction-db:
+          condition: service_healthy
+        eureka:
+          condition: service_healthy
+      deploy:
+        resources:
+          limits:
+            memory: 700m
+      labels:
+        logging: "promtail"
