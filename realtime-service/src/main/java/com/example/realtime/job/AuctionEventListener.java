@@ -1,5 +1,6 @@
-package com.example.realtime.domain;
+package com.example.realtime.job;
 
+import com.example.realtime.domain.models.AuctionEventDTO;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -17,22 +18,14 @@ public class AuctionEventListener {
 
     @RabbitListener(queues = "realtime.auction.events")
     public void handle(AuctionEventDTO event) {
-
         UUID auctionId = event.auctionId();
 
-        switch(event.eventType()) {
+        String destination = switch(event.eventType()) {
+            case AUCTION_WINNER_DECLARED -> "/topic/auction/" + auctionId + "/status";
+            case AUCTION_UPDATED -> "/topic/auction/" + auctionId + "/highest-bid";
+            default -> "/topic/auction/" + auctionId + "/events";
+        };
 
-            case BID_PLACED ->
-                    messagingTemplate.convertAndSend(
-                            "/topic/auction/" + auctionId + "/bids",
-                            event.payload()
-                    );
-
-            case AUCTION_WINNER_DECLARED ->
-                    messagingTemplate.convertAndSend(
-                            "/topic/auction/" + auctionId + "/status",
-                            event.payload()
-                    );
-        }
+        messagingTemplate.convertAndSend(destination, event.data());
     }
 }
