@@ -26,7 +26,7 @@ public class AuctionCloseScheduler {
     }
 
     @Transactional
-    @Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(cron = "*/10 * * * * *")
     public void closeAuctions() {
         List<AuctionEntity> auctions = auctionRepository.findOpenAuctionsPastEndTime();
         if (auctions.isEmpty())

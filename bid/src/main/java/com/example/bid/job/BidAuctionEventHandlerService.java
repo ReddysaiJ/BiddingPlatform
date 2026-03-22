@@ -41,6 +41,7 @@ public class BidAuctionEventHandlerService {
     public void handle(AuctionEventDTO event) {
         if (processedEventRepository.existsByEventId(event.eventId()))
             return;
+        processedEventRepository.save(new ProcessedEventEntity(event.eventId(), OutboxStatus.SENT));
 
         switch (event.eventType()) {
             case AUCTION_CREATED -> handleAuctionCreated(event);
@@ -51,8 +52,6 @@ public class BidAuctionEventHandlerService {
             case AUCTION_WINNER_DECLARED -> handleAuctionWinnerDeclared(event);
             default -> throw new IllegalArgumentException("Unknown event type");
         }
-
-        processedEventRepository.save(new ProcessedEventEntity(event.eventId(), OutboxStatus.SENT));
     }
 
     private void handleAuctionOpen(AuctionEventDTO event) {

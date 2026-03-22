@@ -24,13 +24,16 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - AUCTION_URL=http://host.docker.internal:8081
       - BID_URL=http://host.docker.internal:8085
-      - OAUTH2_ISSUER_URI=http://keycloak:9191
+      - OAUTH2_ISSUER_URI=http://host.docker.internal:9191/realms/auctionrealm
       - EUREKA_URL=http://eureka:8761/eureka
       - MANAGEMENT_TRACING_ENABLED=true
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411/api/v2/spans
     ports:
       - "8080:8080"
     restart: unless-stopped
+    depends_on:
+      eureka:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -46,6 +49,7 @@ services:
         - DB_URL=jdbc:postgresql://auction-db:5432/postgres
         - DB_USERNAME=postgres
         - DB_PASSWORD=1212
+        - EUREKA_URL=http://eureka:8761/eureka
         - MANAGEMENT_TRACING_ENABLED=true
         - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411/api/v2/spans
       ports:
@@ -59,6 +63,6 @@ services:
       deploy:
         resources:
           limits:
-            memory: 700m
+            memory: 1700m
       labels:
         logging: "promtail"

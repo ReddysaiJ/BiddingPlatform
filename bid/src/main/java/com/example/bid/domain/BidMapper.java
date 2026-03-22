@@ -1,9 +1,6 @@
 package com.example.bid.domain;
 
-import com.example.bid.domain.models.AuctionEventDTO;
-import com.example.bid.domain.models.AuctionEventType;
-import com.example.bid.domain.models.BidRequest;
-import com.example.bid.domain.models.BidResponse;
+import com.example.bid.domain.models.*;
 import org.springframework.data.domain.Page;
 
 import java.util.UUID;
@@ -55,6 +52,14 @@ public class BidMapper {
                 auctionId,
                 java.time.Instant.now(),
                 data
+        );
+    }
+
+    public static HighestBidDTO toHighestBidDTO(BidEntity saved) {
+        return new HighestBidDTO(
+                saved.getId(),
+                saved.getAmount(),
+                saved.getUserId()
         );
     }
 }

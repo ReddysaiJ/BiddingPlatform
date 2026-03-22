@@ -34,7 +34,8 @@ public class AuctionEventListener {
     ) {
         if (deaths != null && !deaths.isEmpty()) {
             long retryCount = deaths.stream()
-                    .map(d -> (Number) ((Map<?, ?>) d).get("count"))
+                    .map(d -> (Map<?, ?>) d)
+                    .map(m -> (Number) m.get("count"))
                     .mapToLong(Number::longValue)
                     .sum();
 
@@ -46,9 +47,14 @@ public class AuctionEventListener {
 
         try {
             handler.handle(event);
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             log.error("Business error | eventId={}", event.eventId(), e);
-            throw new AmqpRejectAndDontRequeueException(e.getMessage());
+            throw new AmqpRejectAndDontRequeueException(e);
+        }
+        catch (Exception e) {
+            log.error("Retrying event | eventId={}", event.eventId(), e);
+            throw e;
         }
     }
 }

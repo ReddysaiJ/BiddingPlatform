@@ -79,3 +79,19 @@ services:
       resources:
         limits:
           memory: 2gb
+
+  redis:
+    image: redis:7-alpine
+    container_name: bidding-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 300m

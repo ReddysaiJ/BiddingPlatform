@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.UUID;
 
 @Service
@@ -20,12 +21,14 @@ class BidServiceImpl implements BidService {
     private final BidRepository bidRepository;
     private final ApplicationProperties properties;
     private final OpenAuctionsRepository openAuctionsRepository;
+    private final BidOutboxRepository bidOutboxRepository;
 
     public BidServiceImpl(BidRepository bidRepository, ApplicationProperties properties, UserService userService,
-                          OpenAuctionsRepository openAuctionsRepository) {
+                          OpenAuctionsRepository openAuctionsRepository, BidOutboxRepository bidOutboxRepository) {
         this.bidRepository = bidRepository;
         this.properties = properties;
         this.openAuctionsRepository = openAuctionsRepository;
+        this.bidOutboxRepository = bidOutboxRepository;
     }
 
     @Override
@@ -33,25 +36,36 @@ class BidServiceImpl implements BidService {
     @PreAuthorize("hasRole('BUYER')")
     public BidResponse placeBid(BidRequest request) {
         validateBidRequest(request);
-        OpenAuctionsEntity auction = openAuctionsRepository.findById(request.auctionId()).orElse(null);
+        String currentUser = UserService.getCurrentUserId();
 
-        if(!UserService.getCurrentUserId().equals(request.userId()))
+        if (!currentUser.equals(request.userId()))
             throw new BidNotAllowedException("User mismatch");
-        if (auction == null)
-            throw new BidNotAllowedException("Auction is not open for bidding");
+
+        OpenAuctionsEntity auction = openAuctionsRepository.findByIdForUpdate(request.auctionId())
+                .orElseThrow(() -> new BidNotAllowedException("Auction not open"));
+
         if (auction.getUserId().equals(request.userId()))
-            throw new BidNotAllowedException("Owner cannot bid on own auction");
+            throw new BidNotAllowedException("Owner cannot bid");
 
-        Pageable pageable = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "amount"));
-        BigDecimal highestBid = bidRepository.findTopByAuctionIdOrderByAmountDesc(pageable, request.auctionId())
-                .stream().findFirst()
-                .map(BidEntity::getAmount)
-                .orElse(null);
-
+        BigDecimal highestBid = auction.getHighestBid();
         if (highestBid != null && request.amount().compareTo(highestBid) <= 0)
             throw new InvalidBidException("Bid must be higher than current highest bid");
 
-        BidEntity saved = bidRepository.saveAndFlush(BidMapper.toBidEntity(request));
+        BidEntity bid = BidMapper.toBidEntity(request);
+        BidEntity saved = bidRepository.saveAndFlush(bid);
+
+        auction.setHighestBid(saved.getAmount());
+        auction.setHighestBidderId(saved.getUserId());
+        auction.setBidCount(auction.getBidCount() == null ? 1 : auction.getBidCount() + 1);
+
+        BidOutboxEventEntity outbox = new BidOutboxEventEntity(
+                request.auctionId(),
+                AuctionEventType.HIGHEST_BID_UPDATED,
+                BidMapper.toHighestBidDTO(saved),
+                OutboxStatus.NEW
+        );
+
+        bidOutboxRepository.save(outbox);
         return BidMapper.toBidResponse(saved);
     }
 

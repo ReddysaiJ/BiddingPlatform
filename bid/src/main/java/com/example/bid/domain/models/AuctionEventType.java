@@ -6,6 +6,7 @@ public enum AuctionEventType {
     AUCTION_DELETED,
     AUCTION_OPEN,
     AUCTION_CLOSED,
+    HIGHEST_BID_UPDATED,
     AUCTION_WINNER_DECLARED
 }
 
