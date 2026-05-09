@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+target
+.git
+.vscode
+README.md

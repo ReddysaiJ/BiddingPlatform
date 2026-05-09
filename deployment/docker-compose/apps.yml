@@ -24,7 +24,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - AUCTION_URL=http://host.docker.internal:8081
       - BID_URL=http://host.docker.internal:8085
-      - OAUTH2_ISSUER_URI=http://host.docker.internal:9191/realms/auctionrealm
+      - OAUTH2_ISSUER_URI=http://keycloak:9191/realms/auctionrealm
       - EUREKA_URL=http://eureka:8761/eureka
       - MANAGEMENT_TRACING_ENABLED=true
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411/api/v2/spans
@@ -32,8 +32,7 @@ services:
       - "8080:8080"
     restart: unless-stopped
     depends_on:
-      eureka:
-        condition: service_healthy
+      - eureka
     deploy:
       resources:
         limits:
@@ -56,13 +55,68 @@ services:
         - "8081:8081"
       restart: unless-stopped
       depends_on:
-        auction-db:
-          condition: service_healthy
-        eureka:
-          condition: service_healthy
+        - auction-db
+        - bid
+        - eureka
       deploy:
         resources:
           limits:
             memory: 1700m
       labels:
         logging: "promtail"
+
+  bid:
+      image: reddysai21/bidding-bid
+      container_name: bid
+      environment:
+        - SPRING_PROFILES_ACTIVE=docker
+        - DB_URL=jdbc:postgresql://bid-db:5432/postgres
+        - DB_USERNAME=postgres
+        - DB_PASSWORD=1212
+        - RABBITMQ_HOST=bidding-rabbitmq
+        - RABBITMQ_PORT=5672
+        - RABBITMQ_USERNAME=guest
+        - RABBITMQ_PASSWORD=1212
+        - OAUTH2_ISSUER_URI=http://keycloak:9191/realms/auctionrealm
+        - EUREKA_URL=http://eureka:8761/eureka
+        - MANAGEMENT_TRACING_ENABLED=true
+        - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411/api/v2/spans
+      ports:
+        - "8085:8085"
+      restart: unless-stopped
+      depends_on:
+        - bid-db
+        - eureka
+      deploy:
+        resources:
+          limits:
+            memory: 1700m
+      labels:
+        logging: "promtail"
+
+  realtime:
+      image: reddysai21/bidding-realtime-service
+      container_name: realtime-service
+      environment:
+        - SPRING_PROFILES_ACTIVE=docker
+        - RABBITMQ_HOST=bidding-rabbitmq
+        - RABBITMQ_PORT=5672
+        - RABBITMQ_USERNAME=guest
+        - RABBITMQ_PASSWORD=1212
+        - OAUTH2_ISSUER_URI=http://keycloak:9191/realms/auctionrealm
+        - EUREKA_URL=http://eureka:8761/eureka
+        - MANAGEMENT_TRACING_ENABLED=true
+        - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411/api/v2/spans
+      ports:
+        - "8088:8088"
+      restart: unless-stopped
+      depends_on:
+        - redis
+        - eureka
+      deploy:
+        resources:
+          limits:
+            memory: 1700m
+      labels:
+        logging: "promtail"
+

@@ -20,11 +20,16 @@ tasks:
 
   build:
     cmds:
-      - "{{.MVNW}} -pl EurekaServer spring-boot:build-image -DskipTests"
-#      - "{{.MVNW}} -pl auction spring-boot:build-image -DskipTests"
-#      - "{{.MVNW}} -pl notification spring-boot:build-image -DskipTests"
-#      - "{{.MVNW}} -pl GatewayApplication spring-boot:build-image -DskipTests"
-#      - "{{.MVNW}} -pl bookstore-webapp spring-boot:build-image -DskipTests"
+      - "{{.MVNW}} -pl EurekaServer clean package -DskipTests"
+      - docker build -t reddysai21/bidding-eureka-server ./EurekaServer
+      - "{{.MVNW}} -pl auction clean package -DskipTests"
+      - docker build -t reddysai21/bidding-auction ./auction
+      - "{{.MVNW}} -pl bid clean package -DskipTests"
+      - docker build -t reddysai21/bidding-bid ./bid
+      - "{{.MVNW}} -pl GatewayApplication clean package -DskipTests"
+      - docker build -t reddysai21/bidding-api-gateway ./GatewayApplication
+      - "{{.MVNW}} -pl realtime-service clean package -DskipTests"
+      - docker build -t reddysai21/bidding-realtime-service ./realtime-service
 
   start_infra:
     cmds:

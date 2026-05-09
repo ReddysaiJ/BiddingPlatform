@@ -20,7 +20,7 @@
 		<shedlock.version>6.10.0</shedlock.version>
 		<spring-cloud.version>2025.0.1</spring-cloud.version>
 		<resilience4j.version>2.2.0</resilience4j.version>
-		<dockerImageName>reddysai21/bidding-${project.artifactId}</dockerImageName>
+<!--		<dockerImageName>reddysai21/bidding-${project.artifactId}</dockerImageName>-->
 	</properties>
 
 	<dependencies>
@@ -140,18 +140,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<image>
-						<name>${dockerImageName}</name>
-					</image>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>build-info</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
