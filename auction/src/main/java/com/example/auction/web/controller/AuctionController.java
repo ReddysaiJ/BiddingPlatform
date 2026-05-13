@@ -52,10 +52,10 @@ public class AuctionController {
         return auctionService.getAuctionResponse(uid);
     }
 
-    @GetMapping("/u/{uid}")
-    AuctionDTO openBy(@PathVariable UUID uid) {
-        return auctionService.getAuctionDTO(uid);
-    }
+//    @GetMapping("/u/{uid}")
+//    AuctionDTO openBy(@PathVariable UUID uid) {
+//        return auctionService.getAuctionDTO(uid);
+//    }
 
     @PostMapping
     public ResponseEntity<AuctionResponse> createAuction(
@@ -82,17 +82,17 @@ public class AuctionController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{auctionId}/winner")
-    void declareWinner(@PathVariable UUID auctionId, @RequestBody DeclareWinnerRequest request) {
-        auctionService.declareWinner(
-                auctionId,
-                request.winnerUserId(),
-                request.finalPrice()
-        );
-    }
+//    @PostMapping("/{auctionId}/winner")
+//    void declareWinner(@PathVariable UUID auctionId, @RequestBody DeclareWinnerRequest request) {
+//        auctionService.declareWinner(
+//                auctionId,
+//                request.winnerUserId(),
+//                request.finalPrice()
+//        );
+//    }
 
-    @GetMapping("/me")
-    public Authentication me(Authentication auth) {
-        return auth;
-    }
+//    @GetMapping("/me")
+//    public Authentication me(Authentication auth) {
+//        return auth;
+//    }
 }

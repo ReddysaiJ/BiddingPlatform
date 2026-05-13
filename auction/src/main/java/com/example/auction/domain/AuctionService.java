@@ -84,7 +84,7 @@ public class AuctionService {
                 request.description(),
                 request.basePrice(),
                 seller,
-                request.status(),
+                AuctionStatus.CLOSED,
                 request.startTime(),
                 request.endTime()
         );

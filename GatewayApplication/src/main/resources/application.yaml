@@ -29,7 +29,12 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:9191/realms/auctionrealm}
+          jwk-set-uri: ${OAUTH2_JWK_SET_URI:http://localhost:9191/realms/auctionrealm/protocol/openid-connect/certs}
+
+oauth2:
+  issuer: ${OAUTH2_ISSUER:http://localhost:9191/realms/auctionrealm}
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
 
 server:
   port: ${GATEWAY_PORT:8080}

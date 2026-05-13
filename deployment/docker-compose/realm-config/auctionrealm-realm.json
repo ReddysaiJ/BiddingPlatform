@@ -665,33 +665,34 @@
   }, {
     "id" : "8c944858-3d8e-491b-84e7-8368ca1564fe",
     "clientId" : "auction-bidding",
-    "name" : "auction-bidding",
+    "name" : "Auction Bidding",
     "description" : "",
-    "rootUrl" : "http://localhost:8080",
-    "adminUrl" : "http://localhost:8080",
-    "baseUrl" : "http://localhost:8080",
+    "rootUrl" : "http://localhost:4200",
+    "adminUrl" : "",
+    "baseUrl" : "http://localhost:4200",
     "surrogateAuthRequired" : false,
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
-    "secret" : "Ug6dKh2iPUYHNIaS2bUdUV3MSyCCOZEs",
-    "redirectUris" : [ "http://localhost:8080/login/oauth2/code/keycloak" ],
-    "webOrigins" : [ "http://localhost:8080" ],
+    "redirectUris" : [ "http://localhost:4200/*" ],
+    "webOrigins" : [ "http://localhost:4200" ],
     "notBefore" : 0,
     "bearerOnly" : false,
     "consentRequired" : false,
     "standardFlowEnabled" : true,
     "implicitFlowEnabled" : false,
-    "directAccessGrantsEnabled" : true,
+    "directAccessGrantsEnabled" : false,
     "serviceAccountsEnabled" : false,
-    "publicClient" : false,
+    "publicClient" : true,
     "frontchannelLogout" : true,
     "protocol" : "openid-connect",
     "attributes" : {
       "oidc.ciba.grant.enabled" : "false",
       "client.secret.creation.time" : "1768376115",
       "backchannel.logout.session.required" : "true",
-      "post.logout.redirect.uris" : "http://localhost:8080",
+      "login_theme" : "keycloak",
+      "frontchannel.logout.url" : "http://localhost:4200",
+      "post.logout.redirect.uris" : "http://localhost:4200/*",
       "oauth2.device.authorization.grant.enabled" : "false",
       "display.on.consent.screen" : "false",
       "backchannel.logout.revoke.offline.tokens" : "false"
@@ -728,9 +729,10 @@
     "protocol" : "openid-connect",
     "attributes" : {
       "oidc.ciba.grant.enabled" : "false",
-      "oauth2.device.authorization.grant.enabled" : "false",
       "client.secret.creation.time" : "1768492026",
       "backchannel.logout.session.required" : "true",
+      "post.logout.redirect.uris" : "+",
+      "oauth2.device.authorization.grant.enabled" : "false",
       "backchannel.logout.revoke.offline.tokens" : "false"
     },
     "authenticationFlowBindingOverrides" : { },
@@ -745,6 +747,7 @@
       "config" : {
         "user.session.note" : "clientHost",
         "introspection.token.claim" : "true",
+        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "clientHost",
@@ -759,6 +762,7 @@
       "config" : {
         "user.session.note" : "client_id",
         "introspection.token.claim" : "true",
+        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "client_id",
@@ -773,6 +777,7 @@
       "config" : {
         "user.session.note" : "clientAddress",
         "introspection.token.claim" : "true",
+        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "clientAddress",
@@ -1416,7 +1421,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-full-name-mapper", "saml-user-attribute-mapper", "saml-role-list-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-attribute-mapper", "oidc-usermodel-property-mapper", "oidc-address-mapper", "saml-user-property-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-full-name-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper", "saml-user-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-property-mapper", "oidc-address-mapper", "saml-role-list-mapper" ]
       }
     }, {
       "id" : "8b76e1b2-6d5a-4155-a37c-3ae4d7deda8a",
@@ -1441,7 +1446,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-address-mapper", "oidc-usermodel-property-mapper", "saml-user-attribute-mapper", "saml-role-list-mapper", "oidc-full-name-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper", "oidc-sha256-pairwise-sub-mapper" ]
+        "allowed-protocol-mapper-types" : [ "saml-user-property-mapper", "oidc-full-name-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-attribute-mapper", "saml-role-list-mapper", "oidc-usermodel-attribute-mapper", "oidc-address-mapper", "oidc-usermodel-property-mapper" ]
       }
     }, {
       "id" : "e1940748-65f4-4d6f-8032-e29243ce33f9",

@@ -48,8 +48,13 @@ public class AuctionRealtimeCache {
     }
 
     public void updateHighestBid(UUID auctionId, HighestBidDTO bid) {
-        log.info(String.valueOf(auctionId));
-        redis.opsForValue().set(highestBidKey(auctionId), bid);
+        HighestBidDTO existing = (HighestBidDTO) redis.opsForValue().get(highestBidKey(auctionId));
+
+        if (existing == null || bid.bidAmount().compareTo(existing.bidAmount()) > 0) {
+            redis.opsForValue().set(highestBidKey(auctionId), bid);
+            log.info("Highest bid updated: {}", bid.bidAmount());
+        } else
+            log.warn("Ignored outdated bid: {}", bid.bidAmount());
     }
 
     public void updateWinner(UUID auctionId, Object winner) {

@@ -1,0 +1,69 @@
+<div class="container">
+    @if (loading) {
+        <div class="text-center mt-5">
+            <div class="spinner-border" role="status"></div>
+        </div>
+    } @else if (auction) {
+        <div class="card shadow border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2>
+                        {{ auction.title }}
+                    </h2>
+
+                    <span class="badge bg-dark">
+                        {{ status }}
+                    </span>
+                </div>
+
+                <hr />
+
+                <p>
+                    {{ auction.description }}
+                </p>
+
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="info-box">
+                            <h6>Current Highest Bid</h6>
+                            <h4>
+                                ₹{{ highestBid?.amount }}
+                            </h4>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="info-box">
+                            <h6>Seller</h6>
+                            <h5>
+                                {{ auction.sellerName }}
+                            </h5>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="info-box">
+                            <h6>Ends At</h6>
+                            <h5>
+                                {{ auction.endTime }}
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+
+                @if (winner) {
+                    <div class="alert alert-success mt-4">
+                        Winner:
+                        <strong>
+                            {{ winner.username }}
+                        </strong>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    <app-place-bid
+        [auctionId]="auctionId"
+        (bidPlaced)="loadRealtimeSnapshot()"
+    />
+</div>

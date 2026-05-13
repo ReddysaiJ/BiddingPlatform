@@ -20,16 +20,16 @@ tasks:
 
   build:
     cmds:
-      - "{{.MVNW}} -pl EurekaServer clean package -DskipTests"
-      - docker build -t reddysai21/bidding-eureka-server ./EurekaServer
-      - "{{.MVNW}} -pl auction clean package -DskipTests"
-      - docker build -t reddysai21/bidding-auction ./auction
-      - "{{.MVNW}} -pl bid clean package -DskipTests"
-      - docker build -t reddysai21/bidding-bid ./bid
+#      - "{{.MVNW}} -pl EurekaServer clean package -DskipTests"
+#      - docker build -t reddysai21/bidding-eureka-server ./EurekaServer
+#      - "{{.MVNW}} -pl auction clean package -DskipTests"
+#      - docker build -t reddysai21/bidding-auction ./auction
+#      - "{{.MVNW}} -pl bid clean package -DskipTests"
+#      - docker build -t reddysai21/bidding-bid ./bid
       - "{{.MVNW}} -pl GatewayApplication clean package -DskipTests"
       - docker build -t reddysai21/bidding-api-gateway ./GatewayApplication
-      - "{{.MVNW}} -pl realtime-service clean package -DskipTests"
-      - docker build -t reddysai21/bidding-realtime-service ./realtime-service
+#      - "{{.MVNW}} -pl realtime-service clean package -DskipTests"
+#      - docker build -t reddysai21/bidding-realtime-service ./realtime-service
 
   start_infra:
     cmds:

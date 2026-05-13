@@ -24,7 +24,9 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - AUCTION_URL=http://host.docker.internal:8081
       - BID_URL=http://host.docker.internal:8085
+      - CORS_ALLOWED_ORIGINS=http://localhost:4200
       - OAUTH2_ISSUER_URI=http://keycloak:9191/realms/auctionrealm
+      - OAUTH2_JWK_SET_URI=http://keycloak:9191/realms/auctionrealm/protocol/openid-connect/certs
       - EUREKA_URL=http://eureka:8761/eureka
       - MANAGEMENT_TRACING_ENABLED=true
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411/api/v2/spans
@@ -48,6 +50,11 @@ services:
         - DB_URL=jdbc:postgresql://auction-db:5432/postgres
         - DB_USERNAME=postgres
         - DB_PASSWORD=1212
+        - RABBITMQ_HOST=bidding-rabbitmq
+        - RABBITMQ_PORT=5672
+        - RABBITMQ_USERNAME=guest
+        - RABBITMQ_PASSWORD=1212
+        - OAUTH2_ISSUER_URI=http://keycloak:9191/realms/auctionrealm
         - EUREKA_URL=http://eureka:8761/eureka
         - MANAGEMENT_TRACING_ENABLED=true
         - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411/api/v2/spans
@@ -103,6 +110,8 @@ services:
         - RABBITMQ_PORT=5672
         - RABBITMQ_USERNAME=guest
         - RABBITMQ_PASSWORD=1212
+        - REDIS_HOST=redis
+        - REDIS_PORT=6379
         - OAUTH2_ISSUER_URI=http://keycloak:9191/realms/auctionrealm
         - EUREKA_URL=http://eureka:8761/eureka
         - MANAGEMENT_TRACING_ENABLED=true
