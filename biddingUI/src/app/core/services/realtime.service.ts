@@ -1,4 +1,3 @@
-import SockJS from 'sockjs-client';
 import { Injectable } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
 import { Client, IMessage } from '@stomp/stompjs';
@@ -10,12 +9,13 @@ import { Observable, Subject } from 'rxjs';
 export class RealtimeService {
     private client!: Client;
     private api = `${environment.apiUrl}/realtime/auctions`;
+    private wsUrl = environment.wsUrl || 'ws://localhost:8088/ws';
 
     constructor(private authService: AuthService, private http: HttpClient){}
 
     connect(): void {
         this.client = new Client({
-            webSocketFactory: () => new SockJS(environment.wsUrl),
+            brokerURL: this.wsUrl,
             reconnectDelay: 5000,
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
