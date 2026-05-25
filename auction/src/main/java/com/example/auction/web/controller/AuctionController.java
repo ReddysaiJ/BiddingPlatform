@@ -34,7 +34,7 @@ public class AuctionController {
                                                 @RequestParam(name = "direction", defaultValue = "asc") String direction,
                                                 @RequestParam(name = "query", defaultValue = "") String query){
         log.info("Fetching Auctions...");
-        return auctionService.getAuctions(pageNo, sortBy, direction, query);
+        return auctionService.getAuctions(pageNo, sortBy, direction, query, "");
     }
 
     @GetMapping("/my")

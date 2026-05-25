@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Auction } from '../../core/models/auction.model';
@@ -22,7 +22,7 @@ export class MyAuctionsComponent implements OnInit {
     page: number = 1;
     totalPages: number = 0;
 
-    constructor(private auctionService: AuctionService) {}
+    constructor(private auctionService: AuctionService, private cdr: ChangeDetectorRef) {}
 
     ngOnInit(): void {
         this.loadAuctions();
@@ -36,10 +36,12 @@ export class MyAuctionsComponent implements OnInit {
                 this.auctions = response.data;
                 this.totalPages = response.totalPages;
                 this.loading = false;
+                this.cdr.detectChanges();
             },
 
             error: () => {
                 this.loading = false;
+                this.cdr.detectChanges();
             },
         });
     }

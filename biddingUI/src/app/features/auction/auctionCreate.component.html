@@ -35,6 +35,8 @@
                             type="number"
                             class="form-control"
                             [(ngModel)]="request.basePrice"
+                            min="0"
+                            (input)="request.basePrice = request.basePrice < 0 ? 0 : request.basePrice"
                         />
                     </div>
 

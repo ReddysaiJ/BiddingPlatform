@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Auction } from '../../core/models/auction.model';
@@ -27,42 +27,51 @@ import { FormsModule } from '@angular/forms';
     `],
 })
 export class AuctionListComponent implements OnInit {
+    data!: PagedResponse<Auction>;
     auctions: Auction[] = [];
     loading: boolean = false;
     page: number = 1;
-    totalPages: number = 0;
     query: string = '';
 
-    constructor(private auctionService: AuctionService) {}
+    constructor(private auctionService: AuctionService, private cdr: ChangeDetectorRef) {}
 
     ngOnInit(): void {
         this.loadAuctions();
+        console.log(this.auctions);
     }
 
     loadAuctions(): void {
         this.loading = true;
         this.auctionService.getAllAuctions(this.page, 'startTime', 'asc', this.query).subscribe({
             next: (response: PagedResponse<Auction>) => {
+                console.log(response);
+                this.data = response
                 this.auctions = response.data;
-                this.totalPages = response.totalPages;
                 this.loading = false;
+                this.cdr.detectChanges();
             },
 
             error: () => {
                 this.loading = false;
+                this.cdr.detectChanges();
             },
         });
     }
 
+    onSearch(): void {
+        this.page = 1;
+        this.loadAuctions();
+    }
+
     nextPage(): void {
-        if (this.page < this.totalPages) {
+        if (this.data.hasNext) {
             this.page++;
             this.loadAuctions();
         }
     }
 
     previousPage(): void {
-        if(this.page > 1) {
+        if(this.data.hasPrevious) {
             this.page--;
             this.loadAuctions();
         }

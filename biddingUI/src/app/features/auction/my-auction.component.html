@@ -13,7 +13,7 @@
 
     } @else {
         <div class="row">
-            @for (auction of auctions; track auction.id) {
+            @for (auction of auctions; track auction.uid) {
                 <div class="col-md-4 mb-4">
                     <div class="card shadow-sm border-0 h-100">
                         <div class="card-body">
@@ -31,17 +31,12 @@
                                 {{ auction.description }}
                             </p>
 
-                            <p>
-                                <strong> Highest Bid: </strong>
-                                ₹{{ auction.currentHighestBid }}
-                            </p>
-
                             <div class="d-flex gap-2 mt-4">
-                                <a class="btn btn-dark w-100" [routerLink]="['/auction', auction.id]">
+                                <a class="btn btn-dark w-100" [routerLink]="['/auctions', auction.uid]">
                                     View
                                 </a>
 
-                                <button class="btn btn-outline-danger" (click)="deleteAuction(auction.id)" >
+                                <button class="btn btn-outline-danger" (click)="deleteAuction(auction.uid)" >
                                     Delete
                                 </button>
                             </div>

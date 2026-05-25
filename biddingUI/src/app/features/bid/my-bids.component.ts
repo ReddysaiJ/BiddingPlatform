@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BidService } from '../../core/services/bid.service';
 import { AuthService } from '../../core/auth/auth.service';
@@ -17,7 +17,7 @@ import { PagedResponse } from '../../core/models/pagedResponse.model';
     `],
 })
 export class MyBidsComponent implements OnInit {
-    bids: Bid[] = [];
+    protected data!: PagedResponse<Bid>;
     loading: boolean = false;
     page: number = 1;
     totalPages: number = 0;
@@ -25,6 +25,7 @@ export class MyBidsComponent implements OnInit {
     constructor(
         private bidService: BidService,
         private authService: AuthService,
+        private cdr: ChangeDetectorRef
     ) {}
 
     ngOnInit(): void {
@@ -37,15 +38,15 @@ export class MyBidsComponent implements OnInit {
         this.loading = true;
         this.bidService.getBidsByUser(userId, this.page).subscribe({
             next: (response: PagedResponse<Bid>) => {
-                this.bids = response.data;
-
+                this.data = response;
                 this.totalPages = response.totalPages;
-
                 this.loading = false;
+                this.cdr.detectChanges()
             },
 
             error: () => {
                 this.loading = false;
+                this.cdr.detectChanges()
             },
         });
     }

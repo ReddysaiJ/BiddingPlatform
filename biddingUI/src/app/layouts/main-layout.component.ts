@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { AuthService } from '../../core/auth/auth.service';
+import { AuthService } from '../core/auth/auth.service';
 
 @Component({
     selector: 'app-main-layout',
@@ -161,14 +161,12 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     }
 
     viewProfile(): void {
-        // TODO: Navigate to profile page
-        console.log('Navigate to profile');
+        this.router.navigate(['/profile']);
         this.userMenuOpen = false;
     }
 
     viewSettings(): void {
-        // TODO: Navigate to settings page
-        console.log('Navigate to settings');
+        this.router.navigate(['/settings']);
         this.userMenuOpen = false;
     }
 

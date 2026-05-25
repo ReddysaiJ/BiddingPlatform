@@ -25,6 +25,20 @@ spring:
               filters:
                 - StripPrefix=0
 
+            - id: realtime-http
+              uri: ${REALTIME_URL:http://localhost:8088}
+              predicates:
+                - Path=/realtime/**
+              filters:
+                - StripPrefix=0
+
+            - id: realtime-ws
+              uri: ${REALTIME_WS_URL:ws://localhost:8088}
+              predicates:
+                - Path=/ws/**
+              filters:
+                - StripPrefix=0
+
   security:
     oauth2:
       resourceserver:

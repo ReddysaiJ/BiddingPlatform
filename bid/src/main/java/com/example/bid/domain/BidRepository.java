@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface BidRepository extends JpaRepository<BidEntity, UUID> {
+public interface BidRepository extends JpaRepository<BidEntity, Long> {
 
     @Query("""
         SELECT new com.example.bid.domain.models.BidResponse(
@@ -79,7 +79,7 @@ public interface BidRepository extends JpaRepository<BidEntity, UUID> {
         set b.winner = true
         where b.id = :bidId
     """)
-    void markWinner(UUID bidId);
+    void markWinner(Long bidId);
 
     @Query("""
         select b from BidEntity b

@@ -1,8 +1,7 @@
 export interface Bid {
-    id: number;
-    auctionId: number;
-    bidderId: string;
-    bidderName: string;
+    bidId: string;
+    auctionId: string;
+    userId: string;
     amount: number;
-    bidTime: string;
+    createdAt: string;
 }

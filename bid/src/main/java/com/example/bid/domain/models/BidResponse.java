@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record BidResponse(
-        UUID bidId,
+        Long bidId,
         UUID auctionId,
         String userId,
         BigDecimal amount,

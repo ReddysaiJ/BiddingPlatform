@@ -37,11 +37,6 @@ public class AuctionService {
     }
 
     @Transactional(readOnly = true)
-    public PagedResult<AuctionResponse> getAuctions(int pageNo, String sortBy, String direction, String query) {
-        return getAuctions(pageNo, sortBy, direction, query, "");
-    }
-
-    @Transactional(readOnly = true)
     public PagedResult<AuctionResponse> getAuctions(int pageNo, String sortBy, String direction, String query, String id) {
         Set<String> allowedSort = Set.of("title", "startTime", "endTime", "basePrice", "status");
         if (!allowedSort.contains(sortBy))
@@ -53,12 +48,15 @@ public class AuctionService {
         Pageable pageable = PageRequest.of(pageNo, properties.pageSize(), sort);
 
         Page<AuctionResponse> auctionEntityPage;
-        if(id.isEmpty())
-            auctionEntityPage = auctionRepository.findAll(pageable)
-                    .map(AuctionMapper::toAuctionDTO);
-        else
-            auctionEntityPage = auctionRepository.findBySellerId(pageable, id)
-                    .map(AuctionMapper::toAuctionDTO);
+        if (id.isEmpty()) {
+            auctionEntityPage = query.isBlank()
+                    ? auctionRepository.findAll(pageable).map(AuctionMapper::toAuctionDTO)
+                    : auctionRepository.findByTitleContainingIgnoreCase(query, pageable).map(AuctionMapper::toAuctionDTO);
+        } else {
+            auctionEntityPage = query.isBlank()
+                    ? auctionRepository.findBySellerId(pageable, id).map(AuctionMapper::toAuctionDTO)
+                    : auctionRepository.findBySellerIdAndTitleContainingIgnoreCase(id, query, pageable).map(AuctionMapper::toAuctionDTO);
+        }
 
         return new PagedResult<>(
                 auctionEntityPage.getContent(),
@@ -84,7 +82,7 @@ public class AuctionService {
                 request.description(),
                 request.basePrice(),
                 seller,
-                AuctionStatus.CLOSED,
+                AuctionStatus.DRAFT,
                 request.startTime(),
                 request.endTime()
         );

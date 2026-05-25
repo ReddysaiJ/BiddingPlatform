@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 
 import { RouterOutlet } from '@angular/router';
 
@@ -12,12 +12,6 @@ import { AuthService } from './core/auth/auth.service';
     templateUrl: './app.html',
     styleUrl: './app.css',
 })
-export class App implements OnInit {
+export class App {
     protected readonly title = signal('biddingUI');
-
-    constructor(private authService: AuthService) {}
-
-    ngOnInit(): void {
-        this.authService.checkAuthCallback();
-    }
 }

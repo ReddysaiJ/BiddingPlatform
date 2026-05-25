@@ -1,8 +1,10 @@
-create table processed_event_entity (
-    event_id uuid primary key,
-    processed_at timestamp not null,
-    status varchar(32) not null
+CREATE TABLE processed_event_entity (
+    event_id UUID PRIMARY KEY,
+    processed_at TIMESTAMP NOT NULL,
+    status VARCHAR(32) NOT NULL
 );
 
-create index idx_processed_event_status
-    on processed_event_entity (status);
+CREATE INDEX idx_processed_event_status
+    ON processed_event_entity(status);
+CREATE INDEX idx_processed_event_processed_at
+    ON processed_event_entity(processed_at);

@@ -21,7 +21,7 @@
                     </thead>
 
                     <tbody>
-                        @for (bid of bids; track bid.id) {
+                        @for (bid of data.data; track bid.bidId) {
                             <tr>
                                 <td>
                                     {{ bid.auctionId }}
@@ -32,7 +32,7 @@
                                 </td>
 
                                 <td>
-                                    {{ bid.bidTime }}
+                                    {{ bid.createdAt | date:'medium' }}
                                 </td>
                             </tr>
                         }
@@ -42,7 +42,7 @@
         </div>
 
         <div class="d-flex justify-content-center gap-3 mt-4">
-            <button class="btn btn-outline-dark" (click)="previousPage()">
+            <button class="btn btn-outline-dark" (click)="previousPage()" [disabled]="data.hasPrevious">
                 Previous
             </button>
 
@@ -50,7 +50,7 @@
                 Page {{ page }}
             </span>
 
-            <button class="btn btn-outline-dark" (click)="nextPage()">
+            <button class="btn btn-outline-dark" (click)="nextPage()" [disabled]="data.hasNext">
                 Next
             </button>
         </div>

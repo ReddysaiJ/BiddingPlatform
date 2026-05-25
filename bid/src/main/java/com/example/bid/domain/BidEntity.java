@@ -15,8 +15,9 @@ import java.util.UUID;
 public class BidEntity {
 
     @Id
-    @GeneratedValue
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bid_id_generator")
+    @SequenceGenerator(name = "bid_id_generator", sequenceName = "bid_id_seq")
+    private Long id;
 
     @Column(name = "auction_id", nullable = false)
     private UUID auctionId;
@@ -61,7 +62,7 @@ public class BidEntity {
         this.createdAt = LocalDateTime.now();
     }
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 

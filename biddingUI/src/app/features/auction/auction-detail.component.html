@@ -27,7 +27,7 @@
                         <div class="info-box">
                             <h6>Current Highest Bid</h6>
                             <h4>
-                                ₹{{ highestBid?.amount }}
+                                ₹{{ highestBid?.bidAmount ?? 'No bids yet' }}
                             </h4>
                         </div>
                     </div>
@@ -36,7 +36,7 @@
                         <div class="info-box">
                             <h6>Seller</h6>
                             <h5>
-                                {{ auction.sellerName }}
+                                {{ auction.seller }}
                             </h5>
                         </div>
                     </div>
@@ -45,7 +45,7 @@
                         <div class="info-box">
                             <h6>Ends At</h6>
                             <h5>
-                                {{ auction.endTime }}
+                                {{ auction.endTime | date:'medium' }}
                             </h5>
                         </div>
                     </div>
@@ -62,8 +62,7 @@
             </div>
         </div>
     }
-    <app-place-bid
-        [auctionId]="auctionId"
-        (bidPlaced)="loadRealtimeSnapshot()"
-    />
+    @if (status === 'OPEN') {
+        <app-place-bid [auctionId]="auctionId" (bidPlaced)="loadRealtimeSnapshot()" />
+    }
 </div>

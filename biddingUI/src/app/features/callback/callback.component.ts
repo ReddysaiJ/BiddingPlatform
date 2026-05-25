@@ -6,6 +6,7 @@ import { LoggerService } from '../../core/services/logger.service';
 
 @Component({
     selector: 'app-callback',
+    standalone: true,
     template: `
         <div class="callback-container">
             <div class="spinner-border" role="status">

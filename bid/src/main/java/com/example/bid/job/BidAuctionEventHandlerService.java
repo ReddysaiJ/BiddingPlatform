@@ -1,6 +1,5 @@
 package com.example.bid.job;
 
-import com.example.bid.clients.config.AuctionGateway;
 import com.example.bid.domain.*;
 import com.example.bid.domain.models.AuctionEventDTO;
 import com.example.bid.domain.models.AuctionOpenEvent;
@@ -22,18 +21,16 @@ public class BidAuctionEventHandlerService {
 
     private final OpenAuctionsRepository openAuctionsRepository;
     private final BidRepository bidRepository;
-    private final AuctionGateway auctionGateway;
     private final ObjectMapper objectMapper;
     private final ProcessedEventRepository processedEventRepository;
 
     public BidAuctionEventHandlerService(
             OpenAuctionsRepository openAuctionsRepository,
-            BidRepository bidRepository, AuctionGateway auctionGateway,
+            BidRepository bidRepository,
             ObjectMapper objectMapper,
             ProcessedEventRepository processedEventRepository) {
         this.openAuctionsRepository = openAuctionsRepository;
         this.bidRepository = bidRepository;
-        this.auctionGateway = auctionGateway;
         this.objectMapper = objectMapper;
         this.processedEventRepository = processedEventRepository;
     }
@@ -78,11 +75,11 @@ public class BidAuctionEventHandlerService {
         openAuctionsRepository.deleteById(event.auctionId());
         bidRepository.findHighestBid(event.auctionId()).ifPresent(bid -> {
             bidRepository.markWinner(bid.getId());
-            try {
-                auctionGateway.declareWinner(event.auctionId(), bid.getUserId(), bid.getAmount());
-            } catch (Exception ex) {
-                log.error("Failed to notify Auction service about winner", ex);
-            }
+//            try {
+//                auctionGateway.declareWinner(event.auctionId(), bid.getUserId(), bid.getAmount());
+//            } catch (Exception ex) {
+//                log.error("Failed to notify Auction service about winner", ex);
+//            }
         });
 
         log.info("AUCTION_CLOSED | auctionId={} | eventId={}", event.auctionId(), event.eventId());

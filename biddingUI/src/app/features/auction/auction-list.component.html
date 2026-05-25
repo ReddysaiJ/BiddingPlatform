@@ -7,7 +7,7 @@
             class="form-control w-25"
             placeholder="Search auctions..."
             [(ngModel)]="query"
-            (keyup.enter)="loadAuctions()"
+            (input)="onSearch()"
         />
     </div>
 
@@ -15,32 +15,49 @@
         <div class="text-center mt-5">
             <div class="spinner-border" role="status"></div>
         </div>
-
     } @else {
         <div class="row">
-            @for (auction of auctions; track auction.id) {
+            @if (auctions.length === 0) {
+                <p class="text-center text-muted mt-5">No auctions found.</p>
+            }
+            @for (auction of auctions; track auction.uid) {
                 <div class="col-md-4 mb-4">
                     <div class="card shadow-sm h-100">
                         <div class="card-body">
-                            <h5 class="card-title">
-                                {{ auction.title }}
-                            </h5>
+                            <h5 class="card-title">{{ auction.title }}</h5>
 
-                            <p class="card-text">
-                                {{ auction.description }}
+                            <p class="card-text">{{ auction.description }}</p>
+
+                            <p>
+                                <strong>Seller: </strong>
+                                {{ auction.seller }}
                             </p>
 
                             <p>
-                                <strong> Highest Bid: </strong>
-                                ₹{{ auction.currentHighestBid }}
+                                <strong>Starting Price: </strong>
+                                ₹{{ auction.basePrice }}
                             </p>
 
                             <p>
-                                <strong> Status: </strong>
+                                <strong>Status: </strong>
                                 {{ auction.status }}
                             </p>
 
-                            <a class="btn btn-dark w-100" [routerLink]="['/auction', auction.id]">
+                            @if (auction.status == "OPEN") {
+                                <p>
+                                    <strong>Ends At: </strong>
+                                    {{ auction.endTime | date:'medium' }}
+                                </p>
+                            }
+
+                            @if (auction.status == "DRAFT") {
+                                <p>
+                                    <strong>Starts At: </strong>
+                                    {{ auction.startTime | date:'medium' }}
+                                </p>
+                            }
+
+                            <a class="btn btn-dark w-100" [routerLink]="['/auctions', auction.uid]">
                                 View Auction
                             </a>
                         </div>
@@ -50,17 +67,9 @@
         </div>
 
         <div class="d-flex justify-content-center gap-3 mt-4">
-            <button class="btn btn-outline-dark" (click)="previousPage()">
-                Previous
-            </button>
-
-            <span class="mt-2">
-                Page {{ page }}
-            </span>
-
-            <button class="btn btn-outline-dark" (click)="nextPage()">
-                Next
-            </button>
+            <button class="btn btn-outline-dark" [disabled]="!data.hasPrevious" (click)="previousPage()">Previous</button>
+            <span class="mt-2">Page {{ page }}</span>
+            <button class="btn btn-outline-dark" [disabled]="!data.hasNext" (click)="nextPage()">Next</button>
         </div>
     }
 </div>

@@ -1,14 +1,14 @@
 export interface Auction {
-    id: string;
+    uid: string;
     title: string;
     description: string;
-    startPrice: number;
-    currentHighestBid: number;
-    sellerId: string;
-    sellerName: string;
+    basePrice: number;
+    seller: string;
+    status: AuctionStatus;
     startTime: string;
     endTime: string;
-    status: AuctionStatus;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export enum AuctionStatus {

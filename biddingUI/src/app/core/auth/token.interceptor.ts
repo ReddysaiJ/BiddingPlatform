@@ -16,6 +16,15 @@ export class TokenInterceptor implements HttpInterceptor{
         }
 
         const token = this.authService.getAccessToken();
+        console.log(
+            'REQUEST:',
+            req.url
+        );
+
+        console.log(
+            'TOKEN:',
+            token
+        );
         if(!token)
             return next.handle(req);
 

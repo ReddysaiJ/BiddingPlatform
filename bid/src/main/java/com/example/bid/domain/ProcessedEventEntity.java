@@ -1,9 +1,7 @@
 package com.example.bid.domain;
 
 import com.example.bid.domain.models.OutboxStatus;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,8 +11,14 @@ import java.util.UUID;
 public class ProcessedEventEntity {
 
     @Id
+    @Column(name = "event_id")
     private UUID eventId;
+
+    @Column(name = "processed_at", nullable = false)
     private LocalDateTime processedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 32)
     private OutboxStatus status;
 
     protected ProcessedEventEntity() {}

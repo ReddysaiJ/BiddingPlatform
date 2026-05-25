@@ -38,7 +38,7 @@ export class AuctionCreateComponent {
         this.auctionService.createAuction(this.request).subscribe({
             next: (auction) => {
                 this.loading = false;
-                this.router.navigate(['/auction', auction.id]);
+                this.router.navigate(['/auction', auction.uid]);
             },
 
             error: (error) => {

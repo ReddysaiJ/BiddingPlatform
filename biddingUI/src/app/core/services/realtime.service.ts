@@ -9,19 +9,18 @@ import { Observable, Subject } from 'rxjs';
 export class RealtimeService {
     private client!: Client;
     private api = `${environment.apiUrl}/realtime/auctions`;
-    private wsUrl = environment.wsUrl || 'ws://localhost:8088/ws';
+    private wsUrl = environment.wsUrl || 'ws://localhost:8080/ws';
 
     constructor(private authService: AuthService, private http: HttpClient){}
 
-    connect(): void {
+    connect(onConnected?: () => void): void {
         this.client = new Client({
             brokerURL: this.wsUrl,
-            reconnectDelay: 5000,
-            heartbeatIncoming: 4000,
-            heartbeatOutgoing: 4000,
-            connectHeaders: {
-                Authorization: `Bearer ${this.authService.getAccessToken()}`,
-            },
+            connectHeaders: { Authorization: `Bearer ${this.authService.getAccessToken()}` },
+            onConnect: () => {
+                if (onConnected)
+                    onConnected();
+            }
         });
         this.client.activate();
     }

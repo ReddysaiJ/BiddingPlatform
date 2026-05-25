@@ -16,13 +16,13 @@ public class OpenAuctionsEntity {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(name = "highest_bid")
+    @Column(name = "highest_bid", precision = 12, scale = 2)
     private BigDecimal highestBid;
 
     @Column(name = "highest_bidder_id")
     private String highestBidderId;
 
-    @Column(name = "bid_count")
+    @Column(name = "bid_count", nullable = false)
     private Integer bidCount;
 
     public OpenAuctionsEntity() {}

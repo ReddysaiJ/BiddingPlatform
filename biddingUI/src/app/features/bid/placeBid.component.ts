@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BidService } from '../../core/services/bid.service';
@@ -28,7 +28,7 @@ export class PlaceBidComponent {
     errorMessage: string = '';
     successMessage: string = '';
 
-    constructor(private bidService: BidService, private authService: AuthService) {}
+    constructor(private bidService: BidService, private authService: AuthService, private cdr: ChangeDetectorRef) {}
 
     placeBid(): void {
         this.errorMessage = '';
@@ -51,11 +51,13 @@ export class PlaceBidComponent {
                 this.successMessage = 'Bid placed successfully';
                 this.amount = 0;
                 this.bidPlaced.emit();
+                this.cdr.detectChanges();
             },
 
             error: (error) => {
                 this.loading = false;
                 this.errorMessage = error?.error?.message || 'Failed to place bid';
+                this.cdr.detectChanges();
             },
         });
     }

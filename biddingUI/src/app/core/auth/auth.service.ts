@@ -134,12 +134,19 @@ export class AuthService {
     }
 
     logout(): void {
-        this.accessToken = null;
-        this.refreshToken = null;
-
         sessionStorage.removeItem('access_token');
         sessionStorage.removeItem('refresh_token');
         sessionStorage.removeItem('pkce_code_verifier');
+
+        this.accessToken = null;
+        this.refreshToken = null;
+
+        const logoutUrl =
+            `${environment.logoutUrl}` +
+            `?client_id=${environment.clientId}` +
+            `&post_logout_redirect_uri=${encodeURIComponent('http://localhost:4200')}`;
+
+        window.location.href = logoutUrl;
     }
 
     getAccessToken(): string | null {

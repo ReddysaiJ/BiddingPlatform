@@ -36,6 +36,7 @@ public class GatewaySecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeExchange(ex -> ex
                     .pathMatchers("/actuator/**", "/v3/api-docs/**").permitAll()
+                    .pathMatchers("/ws/**").permitAll()
                     .anyExchange().authenticated()
             )
             .oauth2ResourceServer(oauth2 ->

@@ -86,23 +86,18 @@
                         [attr.aria-expanded]="userMenuOpen"
                     >
                         <i class="bi bi-person-circle"></i>
-                        {{ username || 'User' }}
+                        {{ username || 'Guest' }}
                     </a>
                     <ul
                         class="dropdown-menu dropdown-menu-end"
                         [ngClass]="{ show: userMenuOpen }"
                         [attr.aria-labelledby]="'userDropdown'"
+                        *ngIf="username"
                     >
                         <li>
                             <a class="dropdown-item" href="javascript:void(0)" (click)="viewProfile()">
                                 <i class="bi bi-person"></i>
                                 Profile
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="javascript:void(0)" (click)="viewSettings()">
-                                <i class="bi bi-gear"></i>
-                                Settings
                             </a>
                         </li>
                         <li>

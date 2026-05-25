@@ -1,0 +1,250 @@
+<div class="profile-hero">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-4">
+            <div class="d-flex align-items-center gap-4">
+                <div class="avatar-ring">
+                    {{ initials }}
+                </div>
+
+                <div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <h2 class="text-white fw-bold mb-0">
+                            {{ username }}
+                        </h2>
+
+                        <span class="verified-badge">
+                            <i class="bi bi-patch-check-fill"></i>
+                            Verified
+                        </span>
+                    </div>
+
+                    <p class="hero-subtitle mb-2">
+                        Real-Time Auction Platform User
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-2 mt-2">
+                        @for (role of displayRoles; track role) {
+                            <span
+                                class="role-badge"
+                                [class.role-seller]="role === 'SELLER'"
+                                [class.role-buyer]="role !== 'SELLER'"
+                            >
+                                <i
+                                    class="bi"
+                                    [class.bi-shop]="role === 'SELLER'"
+                                    [class.bi-person-fill]="role !== 'SELLER'"
+                                ></i>
+
+                                {{ role }}
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-actions">
+                <button class="btn btn-light btn-sm px-3">
+                    <i class="bi bi-pencil-square me-2"></i>
+                    Edit Profile
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <!-- Top Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="profile-stat-card">
+                <div class="stat-icon bg-primary-subtle text-primary">
+                    <i class="bi bi-shield-lock-fill"></i>
+                </div>
+
+                <div>
+                    <div class="stat-value">
+                        {{ roles.length }}
+                    </div>
+
+                    <div class="stat-label">
+                        Active Roles
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="profile-stat-card">
+                <div class="stat-icon bg-success-subtle text-success">
+                    <i class="bi bi-person-check-fill"></i>
+                </div>
+
+                <div>
+                    <div class="stat-value">
+                        Active
+                    </div>
+
+                    <div class="stat-label">
+                        Account Status
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="profile-stat-card">
+                <div class="stat-icon bg-warning-subtle text-warning">
+                    <i class="bi bi-fingerprint"></i>
+                </div>
+
+                <div>
+                    <div class="stat-value small-id">
+                        {{ shortUserId }}
+                    </div>
+
+                    <div class="stat-label">
+                        User Reference
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row g-4">
+        <!-- Account Details -->
+        <div class="col-lg-6">
+            <div class="profile-card card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="section-header">
+                        <i class="bi bi-person-vcard-fill"></i>
+                        <h5>Account Information</h5>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-icon">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+
+                        <div>
+                            <div class="info-label">Username</div>
+                            <div class="info-value">
+                                {{ username ?? '—' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-icon">
+                            <i class="bi bi-fingerprint"></i>
+                        </div>
+
+                        <div>
+                            <div class="info-label">User ID</div>
+
+                            <div class="info-value user-id">
+                                {{ userId ?? '—' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+
+                        <div>
+                            <div class="info-label">Authentication</div>
+
+                            <div class="info-value">
+                                OAuth2 + PKCE via Keycloak
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-icon">
+                            <i class="bi bi-envelope-fill"></i>
+                        </div>
+
+                        <div>
+                            <div class="info-label">Email Verification</div>
+
+                            <div class="info-value text-success">
+                                Verified
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Roles & Permissions -->
+        <div class="col-lg-6">
+            <div class="profile-card card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="section-header">
+                        <i class="bi bi-shield-lock-fill"></i>
+                        <h5>Roles & Permissions</h5>
+                    </div>
+
+                    @for (role of displayRoles; track role) {
+                        <div class="permission-card">
+                            <div class="d-flex align-items-center gap-3">
+                                <div
+                                    class="permission-icon"
+                                    [class.permission-seller]="role === 'SELLER'"
+                                    [class.permission-buyer]="role !== 'SELLER'"
+                                >
+                                    <i
+                                        class="bi"
+                                        [class.bi-shop]="role === 'SELLER'"
+                                        [class.bi-person-check-fill]="role !== 'SELLER'"
+                                    ></i>
+                                </div>
+
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">
+                                        {{ role }}
+                                    </div>
+
+                                    <div class="small text-muted">
+                                        @if (role === 'SELLER') {
+                                            Can create and manage auctions
+                                        } @else {
+                                            Can participate in bidding
+                                        }
+                                    </div>
+                                </div>
+
+                                <span class="badge text-bg-success">
+                                    Active
+                                </span>
+                            </div>
+                        </div>
+                    }
+
+                    @if (isSeller) {
+                        <div class="seller-note">
+                            <div class="d-flex align-items-start gap-3">
+                                <i class="bi bi-lightbulb-fill text-warning"></i>
+
+                                <div>
+                                    <div class="fw-semibold mb-1">
+                                        Seller Privileges Enabled
+                                    </div>
+
+                                    <div class="small text-muted">
+                                        Your account can create auctions,
+                                        monitor bids, declare winners,
+                                        and also participate as a buyer.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

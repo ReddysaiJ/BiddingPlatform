@@ -28,7 +28,7 @@ INSERT INTO auctions (
  'iPhone 14 Pro 256GB',
  82000,
  'kc-102','Anjali Sharma','anjali@gmail.com','+91-9000000002',
- 'OPEN',
+ 'DRAFT',
  NOW()-INTERVAL '2 hours', NOW()+INTERVAL '3 days', NOW(), NULL),
 
 -- 3
@@ -37,7 +37,7 @@ INSERT INTO auctions (
  '2019 model, single owner',
  120000,
  'kc-103','Suresh Reddy','suresh@gmail.com','+91-9000000003',
- 'OPEN',
+ 'DRAFT',
  NOW()-INTERVAL '1 day', NOW()+INTERVAL '5 days', NOW(), NULL),
 
 -- 4
@@ -46,7 +46,7 @@ INSERT INTO auctions (
  'Ryzen 9, RTX 3080, 32GB RAM',
  150000,
  'kc-104','Neha Verma','neha@gmail.com','+91-9000000004',
- 'CLOSED',
+ 'DRAFT',
  NOW()-INTERVAL '8 days', NOW()-INTERVAL '2 days', NOW(), NOW()-INTERVAL '2 days'),
 
 -- 5
@@ -55,7 +55,7 @@ INSERT INTO auctions (
  '12GB RAM, 256GB Storage',
  78000,
  'kc-105','Amit Patel','amit@gmail.com','+91-9000000005',
- 'OPEN',
+ 'DRAFT',
  NOW()-INTERVAL '5 hours', NOW()+INTERVAL '2 days', NOW(), NULL),
 
 -- 6
@@ -73,7 +73,7 @@ INSERT INTO auctions (
  'Mirrorless camera with lens',
  92000,
  'kc-107','Priya Nair','priya@gmail.com','+91-9000000007',
- 'OPEN',
+ 'DRAFT',
  NOW()-INTERVAL '6 hours', NOW()+INTERVAL '4 days', NOW(), NULL),
 
 -- 8
@@ -82,7 +82,7 @@ INSERT INTO auctions (
  '11-inch iPad Pro',
  65000,
  'kc-108','Rahul Mehta','rahul@gmail.com','+91-9000000008',
- 'CLOSED',
+ 'DRAFT',
  NOW()-INTERVAL '12 days', NOW()-INTERVAL '6 days', NOW(), NOW()-INTERVAL '6 days'),
 
 -- 9
@@ -91,7 +91,7 @@ INSERT INTO auctions (
  '12GB RAM, 256GB',
  55000,
  'kc-109','Sneha Iyer','sneha@gmail.com','+91-9000000009',
- 'OPEN',
+ 'DRAFT',
  NOW()-INTERVAL '1 hour', NOW()+INTERVAL '1 day', NOW(), NULL),
 
 -- 10
@@ -109,7 +109,7 @@ INSERT INTO auctions (
  'Noise Cancelling Headphones',
  28000,
  'kc-111','Pooja Malhotra','pooja@gmail.com','+91-9000000011',
- 'OPEN',
+ 'DRAFT',
  NOW()-INTERVAL '30 minutes', NOW()+INTERVAL '1 day', NOW(), NULL),
 
 -- 12
@@ -118,7 +118,7 @@ INSERT INTO auctions (
  'GPS + Cellular',
  72000,
  'kc-112','Nikhil Jain','nikhil@gmail.com','+91-9000000012',
- 'CLOSED',
+ 'DRAFT',
  NOW()-INTERVAL '7 days', NOW()-INTERVAL '1 day', NOW(), NOW()-INTERVAL '1 day'),
 
 -- 13
@@ -127,7 +127,7 @@ INSERT INTO auctions (
  'Action Camera',
  42000,
  'kc-113','Meera Joshi','meera@gmail.com','+91-9000000013',
- 'OPEN',
+ 'DRAFT',
  NOW()-INTERVAL '3 hours', NOW()+INTERVAL '2 days', NOW(), NULL),
 
 -- 14
@@ -145,5 +145,5 @@ INSERT INTO auctions (
  'Gaming Laptop RTX 3070',
  135000,
  'kc-115','Harsha Vardhan','harsha@gmail.com','+91-9000000015',
- 'OPEN',
+ 'DRAFT',
  NOW()-INTERVAL '4 hours', NOW()+INTERVAL '6 days', NOW(), NULL);

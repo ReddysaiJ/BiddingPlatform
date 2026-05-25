@@ -3,8 +3,6 @@ package com.example.bid.domain;
 import com.example.bid.domain.models.*;
 import org.springframework.data.domain.Page;
 
-import java.util.UUID;
-
 public class BidMapper {
     static BidRequest toBidRequest(BidEntity entity){
         return new BidRequest(
@@ -45,15 +43,15 @@ public class BidMapper {
         );
     }
 
-    public static AuctionEventDTO buildEvent(AuctionEventType eventType, UUID auctionId, Object data) {
-        return new AuctionEventDTO(
-                UUID.randomUUID(),
-                eventType,
-                auctionId,
-                java.time.Instant.now(),
-                data
-        );
-    }
+//    public static AuctionEventDTO buildEvent(AuctionEventType eventType, Long auctionId, Object data) {
+//        return new AuctionEventDTO(
+//                UUID.randomUUID(),
+//                eventType,
+//                auctionId,
+//                java.time.Instant.now(),
+//                data
+//        );
+//    }
 
     public static HighestBidDTO toHighestBidDTO(BidEntity saved) {
         return new HighestBidDTO(

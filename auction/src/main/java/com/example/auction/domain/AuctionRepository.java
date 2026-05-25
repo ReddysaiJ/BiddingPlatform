@@ -1,5 +1,6 @@
 package com.example.auction.domain;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import com.example.auction.domain.models.AuctionDTO;
 import com.example.auction.domain.models.AuctionResponse;
 import org.springframework.data.domain.Page;
@@ -68,4 +69,8 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Long> {
           and a.endTime <= CURRENT_TIMESTAMP
     """)
     List<AuctionEntity> findOpenAuctionsPastEndTime();
+
+    Page<AuctionEntity> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+
+    Page<AuctionEntity> findBySellerIdAndTitleContainingIgnoreCase(String sellerId, String title, Pageable pageable);
 }
