@@ -29,7 +29,7 @@ public class AuctionService {
     private final ApplicationProperties properties;
     private final UserService userService;
 
-    public AuctionService(AuctionRepository auctionRepository, AuctionOutboxEventRepository auctionOutboxEventRepository, ApplicationProperties properties, UserService userService) {
+    public AuctionService(AuctionRepository auctionRepository, AuctionWatchlistRepository auctionWatchlistRepository, AuctionOutboxEventRepository auctionOutboxEventRepository, ApplicationProperties properties, UserService userService) {
         this.auctionRepository = auctionRepository;
         this.auctionOutboxEventRepository = auctionOutboxEventRepository;
         this.properties = properties;
@@ -37,7 +37,39 @@ public class AuctionService {
     }
 
     @Transactional(readOnly = true)
-    public PagedResult<AuctionResponse> getAuctions(int pageNo, String sortBy, String direction, String query, String id) {
+    public PagedResult<AuctionResponse> getAuctions(int pageNo, String sortBy, String direction, String query, AuctionStatus status) {
+        Customer customer = userService.getSeller();
+
+        Set<String> allowedSort = Set.of("title", "startTime", "endTime", "basePrice", "status");
+        if (!allowedSort.contains(sortBy))
+            sortBy = "startTime";
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+        pageNo = pageNo <= 1 ? 0 : pageNo - 1;
+        Pageable pageable = PageRequest.of(pageNo, properties.pageSize(), sort);
+
+        Page<AuctionResponse> auctionEntityPage = query.isBlank()
+                    ? auctionRepository.findAllForCustomer(customer.id(), status, pageable)
+                    : auctionRepository.findByTitleContainingIgnoreCaseForCustomer(query, customer.id(), status, pageable);
+
+        return new PagedResult<>(
+                auctionEntityPage.getContent(),
+                auctionEntityPage.getTotalElements(),
+                auctionEntityPage.getNumber() + 1,
+                auctionEntityPage.getTotalPages(),
+                auctionEntityPage.isFirst(),
+                auctionEntityPage.isLast(),
+                auctionEntityPage.hasNext(),
+                auctionEntityPage.hasPrevious()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResult<AuctionResponse> getAllAuctions(int pageNo, String sortBy, String direction, String query, String id) {
+        Customer customer = userService.getSeller();
+//        Set<UUID> watchedIds = auctionWatchlistRepository.findAuctionIdsByCustomerId(customer.id());
+
         Set<String> allowedSort = Set.of("title", "startTime", "endTime", "basePrice", "status");
         if (!allowedSort.contains(sortBy))
             sortBy = "startTime";
@@ -50,12 +82,12 @@ public class AuctionService {
         Page<AuctionResponse> auctionEntityPage;
         if (id.isEmpty()) {
             auctionEntityPage = query.isBlank()
-                    ? auctionRepository.findAll(pageable).map(AuctionMapper::toAuctionDTO)
-                    : auctionRepository.findByTitleContainingIgnoreCase(query, pageable).map(AuctionMapper::toAuctionDTO);
+                    ? auctionRepository.findAllWithWatchStatus(customer.id(), pageable)
+                    : auctionRepository.findByTitleContainingIgnoreCase(query, customer.id(), pageable);
         } else {
             auctionEntityPage = query.isBlank()
-                    ? auctionRepository.findBySellerId(pageable, id).map(AuctionMapper::toAuctionDTO)
-                    : auctionRepository.findBySellerIdAndTitleContainingIgnoreCase(id, query, pageable).map(AuctionMapper::toAuctionDTO);
+                    ? auctionRepository.findBySellerId(pageable, id, customer.id())
+                    : auctionRepository.findBySellerIdAndTitleContainingIgnoreCase(id, query, pageable, customer.id());
         }
 
         return new PagedResult<>(
@@ -91,24 +123,25 @@ public class AuctionService {
         AuctionCreatedEvent payload = AuctionMapper.toAuctionCreatedEvent(saved, seller);
         AuctionEventDTO envelope = AuctionMapper.buildEvent(AuctionEventType.AUCTION_CREATED, saved.getUid(), payload);
         auctionOutboxEventRepository.save(new AuctionOutboxEventEntity(saved.getUid(), envelope.eventType(), envelope));
-        return AuctionMapper.toAuctionDTO(saved);
+        return AuctionMapper.toAuctionDTO(saved, false);
     }
 
     @Transactional(readOnly = true)
     public AuctionResponse getAuctionResponse(UUID uid) {
-        return auctionRepository.findResponseByUid(uid)
+        Customer customer = userService.getSeller();
+        return auctionRepository.findResponseByUid(uid, customer.id())
                 .orElseThrow(() -> new AuctionNotFoundException(
                         "Auction Not Found With UID : " + uid
                 ));
     }
 
-    @Transactional(readOnly = true)
-    public AuctionDTO getAuctionDTO(UUID uid) {
-        return auctionRepository.findDTOByUid(uid)
-                .orElseThrow(() -> new AuctionNotFoundException(
-                        "Auction Not Found With UID : " + uid
-                ));
-    }
+//    @Transactional(readOnly = true)
+//    public AuctionDTO getAuctionDTO(UUID uid) {
+//        return auctionRepository.findDTOByUid(uid)
+//                .orElseThrow(() -> new AuctionNotFoundException(
+//                        "Auction Not Found With UID : " + uid
+//                ));
+//    }
 
     @Transactional(readOnly = true)
     AuctionEntity getAuction(UUID uid) {
@@ -134,7 +167,7 @@ public class AuctionService {
         entity.setTitle(request.title());
         entity.setDescription(request.description());
         entity.setBasePrice(request.basePrice());
-        entity.setStatus(request.status());
+        entity.setStatus(AuctionStatus.DRAFT);
         entity.setStartTime(request.startTime());
         entity.setEndTime(request.endTime());
         entity.setUpdatedAt(LocalDateTime.now());
@@ -144,7 +177,7 @@ public class AuctionService {
         AuctionUpdatedEvent payload = AuctionMapper.toAuctionUpdatedEvent(saved, currentCustomer);
         AuctionEventDTO envelope = AuctionMapper.buildEvent(AuctionEventType.AUCTION_UPDATED, saved.getUid(), payload);
         auctionOutboxEventRepository.save(new AuctionOutboxEventEntity(saved.getUid(), envelope.eventType(), envelope));
-        return AuctionMapper.toAuctionDTO(saved);
+        return AuctionMapper.toAuctionDTO(saved, false);
     }
 
     @PreAuthorize("hasRole('SELLER')")

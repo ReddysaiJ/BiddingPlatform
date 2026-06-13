@@ -45,7 +45,7 @@ public class AuctionWatchlistService {
         log.info("Adding auction to watchlist");
         Customer user = userService.getSeller();
         AuctionEntity auctionEntity = auctionService.getAuction(uid);
-        if (auctionWatchlistRepository.existsByUserIdAndAuction_Id(user.id(), auctionEntity.getId()))
+        if (auctionWatchlistRepository.existsByUserIdAndAuction_Uid(user.id(), uid))
             return user;
 
         auctionWatchlistRepository.save(new WatchlistEntity(user.id(), auctionEntity));

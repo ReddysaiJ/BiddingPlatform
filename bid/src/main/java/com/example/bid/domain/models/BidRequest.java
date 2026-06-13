@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public record BidRequest(
         UUID auctionId,
+        String auctionTitle,
         String userId,
         BigDecimal amount
 ) {}

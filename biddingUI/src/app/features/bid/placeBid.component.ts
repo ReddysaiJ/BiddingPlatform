@@ -20,6 +20,9 @@ export class PlaceBidComponent {
     @Input()
     auctionId!: string;
 
+    @Input()
+    auctionTitle!: string;
+
     @Output()
     bidPlaced = new EventEmitter<void>();
 
@@ -41,6 +44,7 @@ export class PlaceBidComponent {
         const request: PlaceBidRequest = {
             userId: this.authService.getUserId()!,
             auctionId: this.auctionId,
+            auctionTitle: this.auctionTitle,
             amount: this.amount,
         };
 
@@ -51,13 +55,13 @@ export class PlaceBidComponent {
                 this.successMessage = 'Bid placed successfully';
                 this.amount = 0;
                 this.bidPlaced.emit();
-                this.cdr.detectChanges();
+                this.cdr.markForCheck();
             },
 
             error: (error) => {
                 this.loading = false;
                 this.errorMessage = error?.error?.message || 'Failed to place bid';
-                this.cdr.detectChanges();
+                this.cdr.markForCheck();
             },
         });
     }

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -7,11 +7,12 @@ import { AuctionService } from '../../core/services/auction.service';
 import { RealtimeService } from '../../core/services/realtime.service';
 import { BidService } from '../../core/services/bid.service';
 import { PlaceBidComponent } from '../bid/placeBid.component';
+import { CountdownTimerComponent } from "../../shared/components/countdown-timer.component";
 
 @Component({
     selector: 'app-auction-detail',
     standalone: true,
-    imports: [CommonModule, PlaceBidComponent],
+    imports: [CommonModule, PlaceBidComponent, CountdownTimerComponent],
     templateUrl: './auction-detail.component.html',
     styles: [`
         .info-box {
@@ -21,6 +22,7 @@ import { PlaceBidComponent } from '../bid/placeBid.component';
             text-align: center;
         }
     `],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AuctionDetailComponent implements OnInit, OnDestroy {
     auctionId!: string;
@@ -29,6 +31,9 @@ export class AuctionDetailComponent implements OnInit, OnDestroy {
     status!: string;
     winner: any;
     loading = false;
+    bidHistory: any[] = [];
+    pulse = false;
+    connected = false;
 
     private subscriptions: Subscription[] = [];
 
@@ -54,11 +59,11 @@ export class AuctionDetailComponent implements OnInit, OnDestroy {
                 this.auction = response;
                 this.status = response.status;
                 this.loading = false;
-                this.cdr.detectChanges();
+                this.cdr.markForCheck();
             },
             error: () => {
                 this.loading = false;
-                this.cdr.detectChanges();
+                this.cdr.markForCheck();
             },
         });
     }
@@ -70,39 +75,54 @@ export class AuctionDetailComponent implements OnInit, OnDestroy {
                 this.highestBid = response.highestBid;
                 this.status = response.status;
                 this.winner = response.winner;
-                this.cdr.detectChanges();
+                this.cdr.markForCheck();
             },
             error: () => {
                 console.warn('Realtime snapshot not available, using auction status from DB');
+                this.cdr.markForCheck();
             }
         });
     }
 
     connectRealtime(): void {
+        if (this.connected)
+            return;
+
+        this.connected = true;
         this.realtimeService.connect(() => {
-            const highestBidSub = this.realtimeService
-                .watchHighestBid(this.auctionId)
-                .subscribe((data) => {
-                    this.highestBid = data;
-                    this.cdr.detectChanges();
-                });
+            this.subscriptions.push(
+                this.realtimeService
+                    .watchHighestBid(this.auctionId)
+                    .subscribe(data => {
+                        this.highestBid = data;
+                        this.bidHistory.unshift(data);
+                        this.animateHighestBid();
+                        this.cdr.markForCheck();
+                    }),
 
-            const statusSub = this.realtimeService
-                .watchStatus(this.auctionId)
-                .subscribe((data) => {
-                    this.status = data;
-                    this.cdr.detectChanges();
-                });
+                this.realtimeService
+                    .watchStatus(this.auctionId)
+                    .subscribe(data => {
+                        this.status = data;
+                        this.cdr.markForCheck();
+                    }),
 
-            const winnerSub = this.realtimeService
-                .watchWinner(this.auctionId)
-                .subscribe((data) => {
-                    this.winner = data;
-                    this.cdr.detectChanges();
-                });
-
-            this.subscriptions.push(highestBidSub, statusSub, winnerSub);
+                this.realtimeService
+                    .watchWinner(this.auctionId)
+                    .subscribe(data => {
+                        this.winner = data;
+                        this.cdr.markForCheck();
+                    })
+            );
         });
+    }
+
+    animateHighestBid(): void {
+        this.pulse = true;
+        setTimeout(() => {
+            this.pulse = false;
+            this.cdr.markForCheck();
+        }, 800);
     }
 
     ngOnDestroy(): void {

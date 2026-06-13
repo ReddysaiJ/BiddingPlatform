@@ -1,9 +1,10 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { BidService } from '../../core/services/bid.service';
 import { AuthService } from '../../core/auth/auth.service';
-import { Bid } from '../../core/models/bid.model';
 import { PagedResponse } from '../../core/models/pagedResponse.model';
+import { BidAuction } from '../../core/models/bidAuction.model';
 
 @Component({
     selector: 'app-my-bids',
@@ -11,57 +12,52 @@ import { PagedResponse } from '../../core/models/pagedResponse.model';
     imports: [CommonModule],
     templateUrl: './my-bids.component.html',
     styles: [`
-        table {
-            background: white;
-        }
-    `],
+        .auction-row { cursor: pointer; transition: background 0.15s; }
+        .auction-row:hover { background: #f8f9fa; }
+        .badge-bids { background: #e9ecef; color: #495057; font-size: 12px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
+    `]
 })
 export class MyBidsComponent implements OnInit {
-    protected data!: PagedResponse<Bid>;
-    loading: boolean = false;
-    page: number = 1;
-    totalPages: number = 0;
+    data!: PagedResponse<BidAuction>;
+    loading = false;
+    page = 1;
 
     constructor(
         private bidService: BidService,
         private authService: AuthService,
+        private router: Router,
         private cdr: ChangeDetectorRef
     ) {}
 
-    ngOnInit(): void {
-        this.loadBids();
-    }
+    ngOnInit(): void { this.loadBids(); }
 
     loadBids(): void {
-        const userId = this.authService.getUserId()!;
-
         this.loading = true;
+        this.cdr.detectChanges();
+        const userId = this.authService.getUserId()!;
         this.bidService.getBidsByUser(userId, this.page).subscribe({
-            next: (response: PagedResponse<Bid>) => {
+            next: (response) => {
                 this.data = response;
-                this.totalPages = response.totalPages;
+                console.log(this.data);
                 this.loading = false;
-                this.cdr.detectChanges()
+                this.cdr.detectChanges();
             },
-
             error: () => {
                 this.loading = false;
-                this.cdr.detectChanges()
-            },
+                this.cdr.detectChanges();
+            }
         });
     }
 
+    openAuction(auction: BidAuction): void {
+        this.router.navigate(['/my-bids', auction.auctionUid]);
+    }
+
     nextPage(): void {
-        if (this.page < this.totalPages) {
-            this.page++;
-            this.loadBids();
-        }
+        if (this.data?.hasNext) { this.page++; this.loadBids(); }
     }
 
     previousPage(): void {
-        if (this.page > 1) {
-            this.page--;
-            this.loadBids();
-        }
+        if (this.data?.hasPrevious) { this.page--; this.loadBids(); }
     }
 }

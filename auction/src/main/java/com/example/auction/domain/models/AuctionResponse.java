@@ -16,6 +16,8 @@ public record AuctionResponse(
         LocalDateTime startTime,
         LocalDateTime endTime,
 
+        boolean watched,
+
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {

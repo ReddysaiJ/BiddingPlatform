@@ -1,15 +1,16 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Auction } from '../../core/models/auction.model';
+import { Auction, AuctionStatus } from '../../core/models/auction.model';
 import { AuctionService } from '../../core/services/auction.service';
 import { PagedResponse } from '../../core/models/pagedResponse.model';
 import { FormsModule } from '@angular/forms';
+import { AuctionCardComponent } from "./auction-card.component";
 
 @Component({
     selector: 'app-auction-list',
     standalone: true,
-    imports: [CommonModule, RouterLink, FormsModule],
+    imports: [CommonModule, FormsModule, AuctionCardComponent],
     templateUrl: './auction-list.component.html',
     styles: [`
         .card {
@@ -27,11 +28,14 @@ import { FormsModule } from '@angular/forms';
     `],
 })
 export class AuctionListComponent implements OnInit {
+    readonly AuctionStatus = AuctionStatus;
+
     data!: PagedResponse<Auction>;
     auctions: Auction[] = [];
     loading: boolean = false;
     page: number = 1;
     query: string = '';
+    status: AuctionStatus = AuctionStatus.OPEN;
 
     constructor(private auctionService: AuctionService, private cdr: ChangeDetectorRef) {}
 
@@ -40,9 +44,17 @@ export class AuctionListComponent implements OnInit {
         console.log(this.auctions);
     }
 
+    changeStatus(status: AuctionStatus) {
+        if(this.status == status)
+            return;
+        this.status = status;
+        this.page = 1;
+        this.loadAuctions();
+    }
+
     loadAuctions(): void {
         this.loading = true;
-        this.auctionService.getAllAuctions(this.page, 'startTime', 'asc', this.query).subscribe({
+        this.auctionService.getAllAuctions(this.page, 'startTime', 'asc', this.query, this.status).subscribe({
             next: (response: PagedResponse<Auction>) => {
                 console.log(response);
                 this.data = response

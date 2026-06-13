@@ -23,9 +23,6 @@ public record UpdateAuctionRequest(
         @Positive(message = "Base price must be greater than zero")
         BigDecimal basePrice,
 
-        @Valid
-        AuctionStatus status,
-
         @NotNull(message = "Start time is required")
         @Future(message = "Start time must be in the future")
         LocalDateTime startTime,

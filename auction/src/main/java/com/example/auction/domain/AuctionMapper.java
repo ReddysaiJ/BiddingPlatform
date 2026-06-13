@@ -5,7 +5,7 @@ import com.example.auction.domain.models.*;
 import java.util.UUID;
 
 public class AuctionMapper {
-    static AuctionResponse toAuctionDTO(AuctionEntity auctionEntity){
+    static AuctionResponse toAuctionDTO(AuctionEntity auctionEntity, boolean watch){
         return new AuctionResponse(
                 auctionEntity.getUid(),
                 auctionEntity.getTitle(),
@@ -15,6 +15,7 @@ public class AuctionMapper {
                 auctionEntity.getStatus(),
                 auctionEntity.getStartTime(),
                 auctionEntity.getEndTime(),
+                watch,
                 auctionEntity.getCreatedAt(),
                 auctionEntity.getUpdatedAt()
         );

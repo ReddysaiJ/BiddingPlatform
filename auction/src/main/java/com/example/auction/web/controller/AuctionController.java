@@ -28,13 +28,23 @@ public class AuctionController {
         this.userService = userService;
     }
 
+    @GetMapping("/status")
+    public PagedResult<AuctionResponse> getAuctions(@RequestParam(name = "page", defaultValue = "1") int pageNo,
+                                                @RequestParam(name = "sortBy", defaultValue = "startTime") String sortBy,
+                                                @RequestParam(name = "direction", defaultValue = "asc") String direction,
+                                                @RequestParam(name = "query", defaultValue = "") String query,
+                                                @RequestParam(name = "status", defaultValue = "OPEN") AuctionStatus status){
+        log.info("Fetching Auctions status...");
+        return auctionService.getAuctions(pageNo, sortBy, direction, query, status);
+    }
+
     @GetMapping
-    public PagedResult<AuctionResponse> openAuctions(@RequestParam(name = "page", defaultValue = "1") int pageNo,
+    public PagedResult<AuctionResponse> getAllAuctions(@RequestParam(name = "page", defaultValue = "1") int pageNo,
                                                 @RequestParam(name = "sortBy", defaultValue = "startTime") String sortBy,
                                                 @RequestParam(name = "direction", defaultValue = "asc") String direction,
                                                 @RequestParam(name = "query", defaultValue = "") String query){
         log.info("Fetching Auctions...");
-        return auctionService.getAuctions(pageNo, sortBy, direction, query, "");
+        return auctionService.getAllAuctions(pageNo, sortBy, direction, query, "");
     }
 
     @GetMapping("/my")
@@ -44,7 +54,7 @@ public class AuctionController {
                                               @RequestParam(name = "query", defaultValue = "") String query){
         Customer user = userService.getSeller();
         log.info("Fetching Auctions for user : {}", user.id());
-        return auctionService.getAuctions(pageNo, sortBy, direction, query, user.id());
+        return auctionService.getAllAuctions(pageNo, sortBy, direction, query, user.id());
     }
 
     @GetMapping("/{uid}")

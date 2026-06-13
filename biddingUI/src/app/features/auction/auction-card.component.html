@@ -1,0 +1,59 @@
+<div class="card auction-card shadow-sm h-100" [routerLink]="['/auctions', auction.uid]">
+    <div class="image-wrapper">
+        <img src="https://placehold.co/600x400" class="card-img-top" />
+
+        <button class="watch-btn" (click)="toggleWatchlist($event)" [disabled]="loading">
+            @if (loading) {
+                <div class="spinner-border spinner-border-sm"></div>
+            } @else {
+                <i class="bi" [ngClass]="auction.watched ? 'bi-heart-fill' : 'bi-heart'"></i>
+            }
+        </button>
+    </div>
+
+    <div class="card-body d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-start">
+            <h5 class="card-title">
+                {{ auction.title }}
+            </h5>
+
+            <span
+                class="badge"
+                [ngClass]="{
+                    'bg-success': auction.status === 'OPEN',
+                    'bg-secondary': auction.status === 'CLOSED',
+                    'bg-warning': auction.status === 'DRAFT',
+                }"
+            >
+                {{ auction.status }}
+            </span>
+        </div>
+
+        <p class="text-muted small">
+            {{ auction.description }}
+        </p>
+
+        <div class="mt-auto">
+            <div class="price">₹{{ auction.basePrice }}</div>
+
+            <div class="small text-muted mt-2">
+                Seller:
+                {{ auction.seller }}
+            </div>
+
+            @if (auction.status == 'OPEN') {
+                <div class="mt-2">
+                    Ends In:
+                    <app-countdown-timer [endTime]="auction.endTime" mode="end">
+                    </app-countdown-timer>
+                </div>
+            } @else if (auction.status == 'DRAFT') {
+                <div class="mt-2">
+                    Starts In:
+                    <app-countdown-timer [endTime]="auction.startTime" mode="start">
+                    </app-countdown-timer>
+                </div>
+            }
+        </div>
+    </div>
+</div>

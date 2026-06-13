@@ -1,0 +1,297 @@
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0" style="border-radius: 14px">
+                <div class="card-body p-4">
+                    <h2 class="mb-4">{{ isEdit ? 'Update Auction' : 'Create Auction' }}</h2>
+
+                    @if (errorMessage) {
+                        <div class="alert alert-danger">{{ errorMessage }}</div>
+                    }
+
+                    @if (isEdit && auction?.status !== 'DRAFT') {
+                        <div class="alert alert-warning">Auction Not Available For Update</div>
+                    } @else {
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control" [(ngModel)]="request.title" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea
+                                rows="4"
+                                class="form-control"
+                                [(ngModel)]="request.description"
+                            ></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Base Price (₹)</label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                [(ngModel)]="request.basePrice"
+                                min="1"
+                                (input)="
+                                    request.basePrice =
+                                        request.basePrice < 0 ? 0 : request.basePrice
+                                "
+                            />
+                        </div>
+
+                        <div class="row">
+                            <!-- START TIME PICKER -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Start Time</label>
+                                    <div class="dp-container" id="start-container">
+                                        <div
+                                            class="dp-trigger"
+                                            [class.dp-error]="startError"
+                                            (click)="togglePicker('start')"
+                                        >
+                                            <i class="bi bi-calendar3"></i>
+                                            <span [class.dp-placeholder]="!request.startTime">
+                                                {{
+                                                    request.startTime
+                                                        ? formatDisplay(request.startTime)
+                                                        : 'Select start time'
+                                                }}
+                                            </span>
+                                            @if (request.startTime) {
+                                                <button
+                                                    class="dp-clear"
+                                                    (click)="clearField($event, 'start')"
+                                                    type="button"
+                                                >
+                                                    ✕
+                                                </button>
+                                            }
+                                        </div>
+
+                                        @if (activePickerStart) {
+                                            <div
+                                                class="dp-popup"
+                                                [class.dp-popup-up]="startPopupUp"
+                                                *ngIf="activePickerStart"
+                                            >
+                                                <div class="cal-header">
+                                                    <button
+                                                        type="button"
+                                                        class="cal-nav"
+                                                        (click)="changeMonth('start', -1)"
+                                                    >
+                                                        ‹
+                                                    </button>
+                                                    <span class="cal-month">{{
+                                                        getMonthLabel('start')
+                                                    }}</span>
+                                                    <button
+                                                        type="button"
+                                                        class="cal-nav"
+                                                        (click)="changeMonth('start', 1)"
+                                                    >
+                                                        ›
+                                                    </button>
+                                                </div>
+                                                <div class="cal-grid">
+                                                    <div
+                                                        class="cal-day-name"
+                                                        *ngFor="let d of dayNames"
+                                                    >
+                                                        {{ d }}
+                                                    </div>
+                                                    <button
+                                                        *ngFor="let cell of startCells"
+                                                        type="button"
+                                                        class="cal-day"
+                                                        [class.cal-selected]="cell.selected"
+                                                        [class.cal-today]="cell.today"
+                                                        [class.cal-other]="cell.otherMonth"
+                                                        [disabled]="cell.disabled"
+                                                        (click)="selectDay('start', cell)"
+                                                    >
+                                                        {{ cell.day }}
+                                                    </button>
+                                                </div>
+                                                <div class="time-row">
+                                                    <div class="time-field">
+                                                        <span class="time-label">Hour</span>
+                                                        <select class="time-select" id="start-hour-select"
+                                                            [(ngModel)]="startHour"
+                                                            (change)="onHourChange('start')">
+                                                            <option *ngFor="let h of validStartHours" [value]="h">
+                                                                {{ padTwo(h) }}:00
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="time-field">
+                                                        <span class="time-label">Minute</span>
+                                                        <select
+                                                            class="time-select"
+                                                            [(ngModel)]="startMinute"
+                                                        >
+                                                            <option
+                                                                *ngFor="let m of validStartMinutes"
+                                                                [value]="m"
+                                                            >
+                                                                {{ padTwo(m) }}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    class="dp-confirm"
+                                                    (click)="confirmPicker('start')"
+                                                >
+                                                    Confirm
+                                                </button>
+                                            </div>
+                                        }
+                                    </div>
+                                    @if (startError) {
+                                        <div class="dp-field-error">{{ startError }}</div>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- END TIME PICKER -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">End Time</label>
+                                    <div class="dp-container" id="end-container">
+                                        <div
+                                            class="dp-trigger"
+                                            [class.dp-error]="endError"
+                                            (click)="togglePicker('end')"
+                                        >
+                                            <i class="bi bi-calendar3"></i>
+                                            <span [class.dp-placeholder]="!request.endTime">
+                                                {{
+                                                    request.endTime
+                                                        ? formatDisplay(request.endTime)
+                                                        : 'Select end time'
+                                                }}
+                                            </span>
+                                            @if (request.endTime) {
+                                                <button
+                                                    class="dp-clear"
+                                                    (click)="clearField($event, 'end')"
+                                                    type="button"
+                                                >
+                                                    ✕
+                                                </button>
+                                            }
+                                        </div>
+
+                                        @if (activePickerEnd) {
+                                            <div
+                                                class="dp-popup"
+                                                [class.dp-popup-up]="endPopupUp"
+                                                *ngIf="activePickerEnd"
+                                            >
+                                                <div class="cal-header">
+                                                    <button
+                                                        type="button"
+                                                        class="cal-nav"
+                                                        (click)="changeMonth('end', -1)"
+                                                    >
+                                                        ‹
+                                                    </button>
+                                                    <span class="cal-month">{{
+                                                        getMonthLabel('end')
+                                                    }}</span>
+                                                    <button
+                                                        type="button"
+                                                        class="cal-nav"
+                                                        (click)="changeMonth('end', 1)"
+                                                    >
+                                                        ›
+                                                    </button>
+                                                </div>
+                                                <div class="cal-grid">
+                                                    <div
+                                                        class="cal-day-name"
+                                                        *ngFor="let d of dayNames"
+                                                    >
+                                                        {{ d }}
+                                                    </div>
+                                                    <button
+                                                        *ngFor="let cell of endCells"
+                                                        type="button"
+                                                        class="cal-day"
+                                                        [class.cal-selected]="cell.selected"
+                                                        [class.cal-today]="cell.today"
+                                                        [class.cal-other]="cell.otherMonth"
+                                                        [disabled]="cell.disabled"
+                                                        (click)="selectDay('end', cell)"
+                                                    >
+                                                        {{ cell.day }}
+                                                    </button>
+                                                </div>
+                                                <div class="time-row">
+                                                    <div class="time-field">
+                                                        <span class="time-label">Hour</span>
+                                                        <select
+                                                            class="time-select"
+                                                            [(ngModel)]="endHour"
+                                                            (change)="onHourChange('end')"
+                                                        >
+                                                            <option
+                                                                *ngFor="let h of validEndHours"
+                                                                [value]="h"
+                                                            >
+                                                                {{ padTwo(h) }}:00
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="time-field">
+                                                        <span class="time-label">Minute</span>
+                                                        <select
+                                                            class="time-select"
+                                                            [(ngModel)]="endMinute"
+                                                        >
+                                                            <option
+                                                                *ngFor="let m of validEndMinutes"
+                                                                [value]="m"
+                                                            >
+                                                                {{ padTwo(m) }}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    class="dp-confirm"
+                                                    (click)="confirmPicker('end')"
+                                                >
+                                                    Confirm
+                                                </button>
+                                            </div>
+                                        }
+                                    </div>
+                                    @if (endError) {
+                                        <div class="dp-field-error">{{ endError }}</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <button
+                            class="btn btn-dark w-100 mt-2"
+                            [disabled]="loading"
+                            (click)="submit()"
+                        >
+                            @if (loading) {
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                            }
+                            {{ isEdit ? 'Update Auction' : 'Create Auction' }}
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

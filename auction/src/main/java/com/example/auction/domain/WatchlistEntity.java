@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Table(
         name = "auction_watchlist",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"user_id", "auction_id"})
+                @UniqueConstraint(columnNames = {"user_id", "auction_uid"})
         }
 )
 class WatchlistEntity {
@@ -20,7 +20,7 @@ class WatchlistEntity {
     private String userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "auction_id", nullable = false)
+    @JoinColumn(name = "auction_uid", referencedColumnName = "uid", nullable = false)
     private AuctionEntity auction;
 
     @Column(nullable = false, updatable = false)

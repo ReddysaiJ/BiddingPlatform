@@ -7,6 +7,7 @@ export interface Auction {
     status: AuctionStatus;
     startTime: string;
     endTime: string;
+    watched: boolean;
     createdAt: string;
     updatedAt: string;
 }

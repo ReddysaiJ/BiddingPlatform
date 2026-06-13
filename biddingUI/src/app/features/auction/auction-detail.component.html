@@ -23,7 +23,16 @@
                 </p>
 
                 <div class="row mt-4">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <div class="info-box">
+                            <h6>Base Price</h6>
+                            <h4>
+                                ₹{{ auction.basePrice }}
+                            </h4>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
                         <div class="info-box">
                             <h6>Current Highest Bid</h6>
                             <h4>
@@ -32,7 +41,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="info-box">
                             <h6>Seller</h6>
                             <h5>
@@ -41,12 +50,17 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="info-box">
-                            <h6>Ends At</h6>
-                            <h5>
-                                {{ auction.endTime | date:'medium' }}
-                            </h5>
+                            @if (auction.status == 'OPEN') {
+                                Ends In:
+                                <app-countdown-timer [endTime]="auction.endTime" mode="end">
+                                </app-countdown-timer>
+                            } @else if (auction.status == 'DRAFT') {
+                                Starts In:
+                                <app-countdown-timer [endTime]="auction.startTime" mode="start">
+                                </app-countdown-timer>
+                            }
                         </div>
                     </div>
                 </div>
@@ -63,6 +77,6 @@
         </div>
     }
     @if (status === 'OPEN') {
-        <app-place-bid [auctionId]="auctionId" (bidPlaced)="loadRealtimeSnapshot()" />
+        <app-place-bid [auctionId]="auctionId" [auctionTitle]="auction.title" (bidPlaced)="loadRealtimeSnapshot()" />
     }
 </div>

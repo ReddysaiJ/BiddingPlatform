@@ -1,6 +1,6 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Live Auctions</h2>
+        <h2>Auctions</h2>
 
         <input
             type="text"
@@ -11,6 +11,38 @@
         />
     </div>
 
+    <ul class="nav nav-pills mb-4">
+        <li class="nav-item">
+            <button
+                class="nav-link"
+                [class.active]="status === AuctionStatus.OPEN"
+                (click)="changeStatus(AuctionStatus.OPEN)"
+            >
+                Live
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button
+                class="nav-link"
+                [class.active]="status === AuctionStatus.DRAFT"
+                (click)="changeStatus(AuctionStatus.DRAFT)"
+            >
+                Upcoming
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button
+                class="nav-link"
+                [class.active]="status === AuctionStatus.CLOSED"
+                (click)="changeStatus(AuctionStatus.CLOSED)"
+            >
+                Completed
+            </button>
+        </li>
+    </ul>
+
     @if (loading) {
         <div class="text-center mt-5">
             <div class="spinner-border" role="status"></div>
@@ -18,58 +50,36 @@
     } @else {
         <div class="row">
             @if (auctions.length === 0) {
-                <p class="text-center text-muted mt-5">No auctions found.</p>
+                <div class="col-12 text-center text-muted mt-5">No auctions found.</div>
             }
+
             @for (auction of auctions; track auction.uid) {
-                <div class="col-md-4 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ auction.title }}</h5>
-
-                            <p class="card-text">{{ auction.description }}</p>
-
-                            <p>
-                                <strong>Seller: </strong>
-                                {{ auction.seller }}
-                            </p>
-
-                            <p>
-                                <strong>Starting Price: </strong>
-                                ₹{{ auction.basePrice }}
-                            </p>
-
-                            <p>
-                                <strong>Status: </strong>
-                                {{ auction.status }}
-                            </p>
-
-                            @if (auction.status == "OPEN") {
-                                <p>
-                                    <strong>Ends At: </strong>
-                                    {{ auction.endTime | date:'medium' }}
-                                </p>
-                            }
-
-                            @if (auction.status == "DRAFT") {
-                                <p>
-                                    <strong>Starts At: </strong>
-                                    {{ auction.startTime | date:'medium' }}
-                                </p>
-                            }
-
-                            <a class="btn btn-dark w-100" [routerLink]="['/auctions', auction.uid]">
-                                View Auction
-                            </a>
-                        </div>
-                    </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <app-auction-card [auction]="auction"> </app-auction-card>
                 </div>
             }
         </div>
 
-        <div class="d-flex justify-content-center gap-3 mt-4">
-            <button class="btn btn-outline-dark" [disabled]="!data.hasPrevious" (click)="previousPage()">Previous</button>
-            <span class="mt-2">Page {{ page }}</span>
-            <button class="btn btn-outline-dark" [disabled]="!data.hasNext" (click)="nextPage()">Next</button>
-        </div>
+        @if (data.totalPages > 0) {
+            <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
+                <button
+                    class="btn btn-outline-dark"
+                    [disabled]="!data.hasPrevious"
+                    (click)="previousPage()"
+                >
+                    Previous
+                </button>
+
+                <span> Page {{ data.pageNumber }} of {{ data.totalPages }} </span>
+
+                <button
+                    class="btn btn-outline-dark"
+                    [disabled]="!data.hasNext"
+                    (click)="nextPage()"
+                >
+                    Next
+                </button>
+            </div>
+        }
     }
 </div>

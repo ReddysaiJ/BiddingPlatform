@@ -7,6 +7,7 @@ import java.util.UUID;
 public record BidResponse(
         Long bidId,
         UUID auctionId,
+        String auctionTitle,
         String userId,
         BigDecimal amount,
         LocalDateTime createdAt

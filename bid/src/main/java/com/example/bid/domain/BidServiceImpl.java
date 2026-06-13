@@ -4,6 +4,8 @@ import com.example.bid.ApplicationProperties;
 import com.example.bid.domain.exception.BidNotAllowedException;
 import com.example.bid.domain.exception.InvalidBidException;
 import com.example.bid.domain.models.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.UUID;
 @Service
 @Transactional
 class BidServiceImpl implements BidService {
+    private static final Logger log = LoggerFactory.getLogger(BidServiceImpl.class);
 
     private final BidRepository bidRepository;
     private final ApplicationProperties properties;
@@ -41,7 +44,10 @@ class BidServiceImpl implements BidService {
             throw new BidNotAllowedException("User mismatch");
 
         OpenAuctionsEntity auction = openAuctionsRepository.findByIdForUpdate(request.auctionId())
-                .orElseThrow(() -> new BidNotAllowedException("Auction not open"));
+                .orElseThrow(() -> {
+                    log.error("Auction not found: {}", request.auctionId());
+                    return new BidNotAllowedException("Auction not open");
+                });
 
         if (auction.getUserId().equals(request.userId()))
             throw new BidNotAllowedException("Owner cannot bid");
@@ -78,19 +84,33 @@ class BidServiceImpl implements BidService {
 
         Pageable pageable = createPageable(pageNo);
         Page<BidResponse> page = bidRepository.findByAuctionIdOrderByCreatedAtDesc(pageable, auctionId);
-        return BidMapper.toPagedResult(page);
+        return BidMapper.toBidResponse(page);
     }
 
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("#userId == authentication.name or hasRole('ADMIN')")
-    public PagedResult<BidResponse> getBidsByUser(String userId, int pageNo) {
+    public PagedResult<BidResponseAuction> getBidsByUser(String userId, int pageNo) {
         if (!StringUtils.hasText(userId))
             throw new IllegalArgumentException("userId must not be blank");
 
+        Pageable pageable = createPageableUnsort(pageNo);
+        Page<BidResponseAuction> page = bidRepository.findAuctionByUserId(pageable, userId);
+        return BidMapper.toBidResponseAuction(page);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("#userId == authentication.name or hasRole('ADMIN')")
+    public PagedResult<BidResponse> getBidsByUserAndAuction(String userId, UUID auctionId, int pageNo) {
+        if (!StringUtils.hasText(userId))
+            throw new IllegalArgumentException("userId must not be blank");
+        if (auctionId == null)
+            throw new IllegalArgumentException("auctionId must not be blank");
+
         Pageable pageable = createPageable(pageNo);
-        Page<BidResponse> page = bidRepository.findByUserIdOrderByCreatedAtDesc(pageable, userId);
-        return BidMapper.toPagedResult(page);
+        Page<BidResponse> page = bidRepository.findByUserIdAndAuctionIdOrderByCreatedAtDesc(pageable, userId, auctionId);
+        return BidMapper.toBidResponse(page);
     }
 
     @Override
@@ -116,12 +136,21 @@ class BidServiceImpl implements BidService {
         return PageRequest.of(safePage, size, Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
+    private Pageable createPageableUnsort(int pageNo) {
+        int safePage = Math.max(pageNo - 1, 0);
+        int size = Math.max(properties.pageSize(), 1);
+        return PageRequest.of(safePage, size);
+    }
+
     private void validateBidRequest(BidRequest request) {
         if (request == null)
             throw new IllegalArgumentException("BidRequest must not be null");
 
         if (request.auctionId() == null)
             throw new IllegalArgumentException("auctionId must not be null");
+
+        if (request.auctionTitle() == null)
+            throw new IllegalArgumentException("auctionTitle must not be null");
 
         if (!StringUtils.hasText(request.userId()))
             throw new IllegalArgumentException("userId must not be blank");

@@ -15,9 +15,8 @@ import java.util.UUID;
 public class BidOutboxEventEntity {
 
     @Id
-    @Column(name = "event_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "event_id_generator")
-    @SequenceGenerator(name = "event_id_generator", sequenceName = "event_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "event_id", nullable = false, updatable = false)
     private UUID eventId;
 
     @Column(name = "auction_id", nullable = false)

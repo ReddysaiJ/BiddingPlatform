@@ -14,12 +14,33 @@ export class RealtimeService {
     constructor(private authService: AuthService, private http: HttpClient){}
 
     connect(onConnected?: () => void): void {
+        if (this.client?.active)
+            return;
+
         this.client = new Client({
             brokerURL: this.wsUrl,
-            connectHeaders: { Authorization: `Bearer ${this.authService.getAccessToken()}` },
+            connectHeaders: {
+                Authorization: `Bearer ${this.authService.getAccessToken()}`
+            },
+
+            reconnectDelay: 5000,
+            heartbeatIncoming: 4000,
+            heartbeatOutgoing: 4000,
+
+            debug: () => {},
             onConnect: () => {
+                console.log('WebSocket Connected');
+
                 if (onConnected)
                     onConnected();
+            },
+
+            onStompError: frame => {
+                console.error(frame);
+            },
+
+            onWebSocketClose: () => {
+                console.log('WebSocket Closed');
             }
         });
         this.client.activate();

@@ -32,11 +32,27 @@
                             </p>
 
                             <div class="d-flex gap-2 mt-4">
-                                <a class="btn btn-dark w-100" [routerLink]="['/auctions', auction.uid]">
+                                <a
+                                    class="btn btn-dark"
+                                    [routerLink]="['/auctions', auction.uid]"
+                                    width=100px
+                                >
                                     View
                                 </a>
 
-                                <button class="btn btn-outline-danger" (click)="deleteAuction(auction.uid)" >
+                                @if(auction.status == 'DRAFT'){
+                                    <a
+                                        class="btn btn-outline-primary"
+                                        [routerLink]="['/auction/update', auction.uid]"
+                                    >
+                                        Update
+                                    </a>
+                                }
+
+                                <button
+                                    class="btn btn-outline-danger"
+                                    (click)="deleteAuction(auction.uid)"
+                                >
                                     Delete
                                 </button>
                             </div>

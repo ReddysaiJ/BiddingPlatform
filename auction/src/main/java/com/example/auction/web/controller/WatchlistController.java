@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/auctions")
+@RequestMapping("/api/auctions/watch")
 public class WatchlistController {
     private static final Logger log = LoggerFactory.getLogger(WatchlistController.class);
 
@@ -22,7 +22,7 @@ public class WatchlistController {
         this.auctionWatchlistService = auctionWatchlistService;
     }
 
-    @GetMapping("/watch")
+    @GetMapping
     public PagedResult<AuctionResponse> myWatchlist(
             @RequestParam(name = "page", defaultValue = "1") int pageNo,
             @RequestParam(name = "sortBy", defaultValue = "startTime") String sortBy,
@@ -31,15 +31,15 @@ public class WatchlistController {
         return auctionWatchlistService.getAuctions(pageNo, sortBy, direction);
     }
 
-    @PostMapping("/{uid}/watch")
-    public ResponseEntity<Void> watch(@PathVariable UUID uid) {
+    @PostMapping
+    public ResponseEntity<Void> watch(UUID uid) {
         Customer user = auctionWatchlistService.addToWatchlist(uid);
         log.info("Watchlist updated with {} for user {}", uid, user.id());
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{uid}/watch")
-    public ResponseEntity<Void> unwatch(@PathVariable UUID uid) {
+    @DeleteMapping
+    public ResponseEntity<Void> unwatch(UUID uid) {
         Customer user = auctionWatchlistService.removeFromWatchlist(uid);
         log.info("Watchlist deleted with {} for user {}", uid, user.id());
         return ResponseEntity.noContent().build();

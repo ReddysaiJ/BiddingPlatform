@@ -30,6 +30,7 @@ public class OpenAuctionsEntity {
     public OpenAuctionsEntity(UUID auctionUid, String userId) {
         this.auctionUid = auctionUid;
         this.userId = userId;
+        bidCount = 0;
     }
 
     public UUID getAuctionUid() {

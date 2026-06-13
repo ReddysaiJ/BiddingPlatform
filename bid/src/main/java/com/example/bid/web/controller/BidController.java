@@ -4,6 +4,7 @@ import com.example.bid.domain.BidService;
 import com.example.bid.domain.PagedResult;
 import com.example.bid.domain.models.BidRequest;
 import com.example.bid.domain.models.BidResponse;
+import com.example.bid.domain.models.BidResponseAuction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -37,11 +38,20 @@ public class BidController {
     }
 
     @GetMapping("/user/{userId}")
-    public PagedResult<BidResponse> getBidsByUser(
+    public PagedResult<BidResponseAuction> getBidsByUser(
             @PathVariable String userId,
             @RequestParam(name = "page", defaultValue = "1") int pageNo) {
-        log.info("Going to fetch Bids by UserId : {}", userId);
+        log.info("Going to fetch Bid auctions for User : {}", userId);
         return bidService.getBidsByUser(userId, pageNo);
+    }
+
+    @GetMapping("/user/{userId}/{auctionId}")
+    public PagedResult<BidResponse> getBidsByUserAndAuction(
+            @PathVariable String userId,
+            @PathVariable UUID auctionId,
+            @RequestParam(name = "page", defaultValue = "1") int pageNo) {
+        log.info("Going to fetch Bids of auctions for User : {} and Auction : {}", userId, auctionId);
+        return bidService.getBidsByUserAndAuction(userId, auctionId, pageNo);
     }
 
     @GetMapping("/auction/{auctionId}/highest")

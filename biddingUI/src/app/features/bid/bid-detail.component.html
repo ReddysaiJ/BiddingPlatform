@@ -1,6 +1,9 @@
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>My Bids</h2>
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <button class="btn btn-outline-dark btn-sm" (click)="goBack()">
+            <i class="bi bi-arrow-left me-1"></i> Back
+        </button>
+        <h2 class="mb-0">{{ auctionTitle || 'My Bids' }}</h2>
     </div>
 
     @if (loading) {
@@ -8,31 +11,27 @@
             <div class="spinner-border" role="status"></div>
         </div>
     } @else if (!data?.data?.length) {
-        <p class="text-center text-muted mt-5">You haven't placed any bids yet.</p>
+        <p class="text-center text-muted mt-5">No bids found for this auction.</p>
     } @else {
         <div class="card shadow-sm border-0" style="border-radius: 12px">
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
                     <thead class="table-dark">
                         <tr>
-                            <th>Auction</th>
-                            <th class="text-center">Total Bids</th>
-                            <th class="text-end">View</th>
+                            <th>#</th>
+                            <th>Amount</th>
+                            <th>Bid Time</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @for (auction of data.data; track auction.auctionUid) {
-                            <tr class="auction-row" (click)="openAuction(auction)">
-                                <td class="fw-500 py-3">{{ auction.auctionTitle }}</td>
-                                <td class="text-center py-3">
-                                    <span class="badge-bids"
-                                        >{{ auction.totalBids }} bid{{
-                                            auction.totalBids !== 1 ? 's' : ''
-                                        }}</span
-                                    >
+                        @for (bid of data.data; track bid.bidId; let i = $index) {
+                            <tr class="bid-row">
+                                <td class="py-3 text-muted">{{ (page - 1) * 10 + i + 1 }}</td>
+                                <td class="py-3">
+                                    <span class="amount-badge">₹{{ bid.amount }}</span>
                                 </td>
-                                <td class="text-end py-3">
-                                    <i class="bi bi-chevron-right text-muted"></i>
+                                <td class="py-3 text-muted">
+                                    {{ bid.createdAt | date: 'medium' }}
                                 </td>
                             </tr>
                         }

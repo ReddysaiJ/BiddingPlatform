@@ -1,6 +1,7 @@
 package com.example.bid.domain;
 
 import com.example.bid.domain.models.BidResponse;
+import com.example.bid.domain.models.BidResponseAuction;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ public interface BidRepository extends JpaRepository<BidEntity, Long> {
         SELECT new com.example.bid.domain.models.BidResponse(
             b.id,
             b.auctionId,
+            b.auctionTitle,
             b.userId,
             b.amount,
             b.createdAt
@@ -31,17 +33,33 @@ public interface BidRepository extends JpaRepository<BidEntity, Long> {
     Page<BidResponse> findByAuctionIdOrderByCreatedAtDesc(Pageable pageable, UUID auctionId);
 
     @Query("""
+        SELECT new com.example.bid.domain.models.BidResponseAuction(
+            b.auctionId,
+            b.auctionTitle,
+            count(b)
+        )
+        FROM BidEntity b
+        WHERE b.userId = :userId
+        GROUP BY b.auctionId, b.auctionTitle
+        ORDER BY MAX(b.createdAt) DESC
+    """)
+    Page<BidResponseAuction> findAuctionByUserId(Pageable pageable, String userId);
+
+    @Query("""
         SELECT new com.example.bid.domain.models.BidResponse(
             b.id,
             b.auctionId,
+            b.auctionTitle,
             b.userId,
             b.amount,
             b.createdAt
         )
         FROM BidEntity b
         WHERE b.userId = :userId
+            AND
+              b.auctionId = :auctionId
     """)
-    Page<BidResponse> findByUserIdOrderByCreatedAtDesc(Pageable pageable, String userId);
+    Page<BidResponse> findByUserIdAndAuctionIdOrderByCreatedAtDesc(Pageable pageable, String userId, UUID auctionId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""

@@ -7,6 +7,7 @@ public class BidMapper {
     static BidRequest toBidRequest(BidEntity entity){
         return new BidRequest(
                 entity.getAuctionId(),
+                entity.getAuctionTitle(),
                 entity.getUserId(),
                 entity.getAmount()
         );
@@ -16,6 +17,7 @@ public class BidMapper {
         return new BidResponse(
                 entity.getId(),
                 entity.getAuctionId(),
+                entity.getAuctionTitle(),
                 entity.getUserId(),
                 entity.getAmount(),
                 entity.getCreatedAt()
@@ -25,12 +27,26 @@ public class BidMapper {
     static BidEntity toBidEntity(BidRequest request){
         return new BidEntity(
                 request.auctionId(),
+                request.auctionTitle(),
                 request.userId(),
                 request.amount()
         );
     }
 
-    public static PagedResult<BidResponse> toPagedResult(Page<BidResponse> result) {
+    public static PagedResult<BidResponseAuction> toBidResponseAuction(Page<BidResponseAuction> result) {
+        return new PagedResult<>(
+                result.getContent(),
+                result.getTotalElements(),
+                result.getNumber(),
+                result.getTotalPages(),
+                result.isFirst(),
+                result.isLast(),
+                result.hasNext(),
+                result.hasPrevious()
+        );
+    }
+
+    public static PagedResult<BidResponse> toBidResponse(Page<BidResponse> result) {
         return new PagedResult<>(
                 result.getContent(),
                 result.getTotalElements(),

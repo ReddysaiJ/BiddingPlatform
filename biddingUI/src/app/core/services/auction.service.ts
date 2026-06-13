@@ -1,10 +1,11 @@
-import { Auction } from './../models/auction.model';
+import { Auction, AuctionStatus } from './../models/auction.model';
 import { Injectable } from "@angular/core";
 import { environment } from "../../../environments/environment";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { PagedResponse } from '../models/pagedResponse.model';
 import { CreateAuctionRequest } from '../models/createAuctionRequest.model';
+import { UpdateAuctionRequest } from '../models/updateAuctionRequest.model';
 
 @Injectable({providedIn: 'root'})
 export class AuctionService{
@@ -12,13 +13,14 @@ export class AuctionService{
 
     constructor(private http: HttpClient){}
 
-    getAllAuctions(page: number = 1, sortBy: string = 'startTime', direction: string = 'asc', query: string = ''): Observable<PagedResponse<Auction>>{
+    getAllAuctions(page: number = 1, sortBy: string = 'startTime', direction: string = 'asc', query: string = '', status: AuctionStatus): Observable<PagedResponse<Auction>>{
         const params = new HttpParams()
                         .set('page', page)
                         .set('sortBy', sortBy)
                         .set('direction', direction)
-                        .set('query', query);
-        return this.http.get<PagedResponse<Auction>>(this.api, { params });
+                        .set('query', query)
+                        .set('status', status);
+        return this.http.get<PagedResponse<Auction>>(`${this.api}/status`, { params });
     }
 
     getAuctionById(uid : string): Observable<Auction>{
@@ -29,7 +31,7 @@ export class AuctionService{
         return this.http.post<Auction>(this.api, auction);
     }
 
-    updateAuction(auction: Auction): Observable<Auction>{
+    updateAuction(auction: UpdateAuctionRequest): Observable<Auction>{
         return this.http.put<Auction>(this.api, auction);
     }
 

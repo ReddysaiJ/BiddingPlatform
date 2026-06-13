@@ -3,6 +3,7 @@ CREATE SEQUENCE IF NOT EXISTS bid_id_seq START WITH 1 INCREMENT BY 1;
 CREATE TABLE bids (
       id BIGINT PRIMARY KEY DEFAULT nextval('bid_id_seq'),
       auction_id UUID NOT NULL,
+      auction_title VARCHAR(100) NOT NULL,
       user_id VARCHAR(100) NOT NULL,
       amount NUMERIC(12,2) NOT NULL,
       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

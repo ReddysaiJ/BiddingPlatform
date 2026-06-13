@@ -36,6 +36,18 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        routerLink="/watchlist"
+                        routerLinkActive="active"
+                        (click)="navbarOpen = false"
+                    >
+                    <i class="bi bi-heart"></i>
+                    Watchlist
+                    </a>
+                </li>
+
                 <!-- Seller-only menu items -->
                 <li class="nav-item" *ngIf="isSeller">
                     <a
