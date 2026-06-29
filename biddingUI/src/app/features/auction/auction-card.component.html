@@ -1,6 +1,6 @@
 <div class="card auction-card shadow-sm h-100" [routerLink]="['/auctions', auction.uid]">
     <div class="image-wrapper">
-        <img src="https://placehold.co/600x400" class="card-img-top" />
+        <img src={{auction.baseImageUrl}}  alt="https://placehold.co/600x400" class="card-img-top" />
 
         <button class="watch-btn" (click)="toggleWatchlist($event)" [disabled]="loading">
             @if (loading) {

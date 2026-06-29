@@ -16,12 +16,18 @@ CREATE TABLE auctions (
 
     status        VARCHAR(32) NOT NULL,
 
+    base_image_url     VARCHAR(1000),
+    base_public_id     VARCHAR(255),
+
+    image_urls         JSONB NOT NULL DEFAULT '[]'::jsonb,
+    image_public_ids   JSONB NOT NULL DEFAULT '[]'::jsonb,
+
     start_time    TIMESTAMP NOT NULL,
     end_time      TIMESTAMP NOT NULL,
 
     created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP,
-    
+
     winner_id     VARCHAR(100),
     winning_amount NUMERIC(12,2),
     winner_declared BOOLEAN NOT NULL DEFAULT FALSE

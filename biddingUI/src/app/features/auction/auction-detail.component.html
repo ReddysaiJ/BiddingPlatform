@@ -1,82 +1,100 @@
-<div class="container">
-    @if (loading) {
-        <div class="text-center mt-5">
-            <div class="spinner-border" role="status"></div>
+<div class="row mx-2 mx-md-3 mx-lg-4">
+    <div class="col-lg-7">
+
+        <div class="border rounded overflow-hidden mb-3">
+            <img
+                [src]="selectedImage"
+                class="img-fluid w-100"
+                style="height: 450px; object-fit: cover"
+                alt="Auction Image"
+            />
         </div>
-    } @else if (auction) {
-        <div class="card shadow border-0">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2>
-                        {{ auction.title }}
-                    </h2>
 
-                    <span class="badge bg-dark">
-                        {{ status }}
-                    </span>
-                </div>
-
-                <hr />
-
-                <p>
-                    {{ auction.description }}
-                </p>
-
-                <div class="row mt-4">
-                    <div class="col-md-3">
-                        <div class="info-box">
-                            <h6>Base Price</h6>
-                            <h4>
-                                ₹{{ auction.basePrice }}
-                            </h4>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="info-box">
-                            <h6>Current Highest Bid</h6>
-                            <h4>
-                                ₹{{ highestBid?.bidAmount ?? 'No bids yet' }}
-                            </h4>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="info-box">
-                            <h6>Seller</h6>
-                            <h5>
-                                {{ auction.seller }}
-                            </h5>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="info-box">
-                            @if (auction.status == 'OPEN') {
-                                Ends In:
-                                <app-countdown-timer [endTime]="auction.endTime" mode="end">
-                                </app-countdown-timer>
-                            } @else if (auction.status == 'DRAFT') {
-                                Starts In:
-                                <app-countdown-timer [endTime]="auction.startTime" mode="start">
-                                </app-countdown-timer>
-                            }
-                        </div>
-                    </div>
-                </div>
-
-                @if (winner) {
-                    <div class="alert alert-success mt-4">
-                        Winner:
-                        <strong>
-                            {{ winner.username }}
-                        </strong>
-                    </div>
+        @if (allImages.length > 1) {
+            <div class="d-flex gap-2 flex-wrap">
+                @for (img of allImages; track img) {
+                    <img
+                        [src]="img"
+                        (click)="selectImage(img)"
+                        class="rounded border"
+                        [class.border-primary]="selectedImage === img"
+                        style="
+                            width: 90px;
+                            height: 90px;
+                            object-fit: cover;
+                            cursor: pointer;
+                            border-width: 3px !important;
+                        "
+                    />
                 }
             </div>
+        }
+
+    </div>
+
+    <div class="col-lg-5">
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>{{ auction.title }}</h2>
+
+            <span class="badge bg-dark">
+                {{ status }}
+            </span>
         </div>
-    }
-    @if (status === 'OPEN') {
-        <app-place-bid [auctionId]="auctionId" [auctionTitle]="auction.title" (bidPlaced)="loadRealtimeSnapshot()" />
-    }
+
+        <hr />
+
+        <p>
+            {{ auction.description }}
+        </p>
+
+        <div class="row mt-4">
+            <div class="col-6 mb-3">
+                <div class="info-box">
+                    <h6>Base Price</h6>
+                    <h4>₹{{ auction.basePrice }}</h4>
+                </div>
+            </div>
+
+            <div class="col-6 mb-3">
+                <div class="info-box">
+                    <h6>Current Highest Bid</h6>
+                    <h4>
+                        ₹{{ highestBid?.bidAmount ?? 'No bids yet' }}
+                    </h4>
+                </div>
+            </div>
+
+            <div class="col-6 mb-3">
+                <div class="info-box">
+                    <h6>Seller</h6>
+                    <h5>{{ auction.seller }}</h5>
+                </div>
+            </div>
+
+            <div class="col-6 mb-3">
+                <div class="info-box">
+                    @if (auction.status == 'OPEN') {
+                        Starts/Ends In:
+                        <app-countdown-timer
+                            [endTime]="auction.endTime"
+                            mode="end">
+                        </app-countdown-timer>
+                    } @else if (auction.status == 'DRAFT') {
+                        Starts In:
+                        <app-countdown-timer
+                            [endTime]="auction.startTime"
+                            mode="start">
+                        </app-countdown-timer>
+                    } @else {
+                        <h6>Winner</h6>
+                        {{ winner ? winner.username : 'NA' }}
+                    }
+                </div>
+            </div>
+        </div>
+        @if (status === 'OPEN') {
+            <app-place-bid [auctionId]="auctionId" [auctionTitle]="auction.title" (bidPlaced)="loadRealtimeSnapshot()" />
+        }
+    </div>
 </div>

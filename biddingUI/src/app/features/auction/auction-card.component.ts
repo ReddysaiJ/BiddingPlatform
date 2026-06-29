@@ -1,11 +1,7 @@
 import { Component, EventEmitter, Input, Output, ChangeDetectorRef } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
-
 import { RouterLink } from '@angular/router';
-
 import { Auction } from '../../core/models/auction.model';
-
 import { WatchlistService } from '../../core/services/watchlist.service';
 import { CountdownTimerComponent } from "../../shared/components/countdown-timer.component";
 

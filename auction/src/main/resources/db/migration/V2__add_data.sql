@@ -8,11 +8,16 @@ INSERT INTO auctions (
     seller_email,
     seller_phone,
     status,
+    base_image_url,
+    base_public_id,
+    image_urls,
+    image_public_ids,
     start_time,
     end_time,
     created_at,
     updated_at
 ) VALUES
+
 -- 1
 ('a1111111-1111-1111-1111-111111111111',
  'MacBook Pro M2',
@@ -20,6 +25,10 @@ INSERT INTO auctions (
  95000,
  'kc-101','Ravi Kumar','ravi@gmail.com','+91-9000000001',
  'DRAFT',
+ 'https://picsum.photos/seed/macbook/800/600',
+ 'auctions/macbook-pro-m2',
+ '["https://picsum.photos/seed/macbook1/800/600","https://picsum.photos/seed/macbook2/800/600"]'::jsonb,
+ '["auctions/macbook1","auctions/macbook2"]'::jsonb,
  NOW()+INTERVAL '1 day', NOW()+INTERVAL '6 days', NOW(), NULL),
 
 -- 2
@@ -29,6 +38,10 @@ INSERT INTO auctions (
  82000,
  'kc-102','Anjali Sharma','anjali@gmail.com','+91-9000000002',
  'DRAFT',
+ 'https://picsum.photos/seed/iphone14/800/600',
+ 'auctions/iphone14',
+ '["https://picsum.photos/seed/iphone141/800/600"]'::jsonb,
+ '["auctions/iphone141"]'::jsonb,
  NOW()-INTERVAL '2 hours', NOW()+INTERVAL '3 days', NOW(), NULL),
 
 -- 3
@@ -38,6 +51,10 @@ INSERT INTO auctions (
  120000,
  'kc-103','Suresh Reddy','suresh@gmail.com','+91-9000000003',
  'DRAFT',
+ 'https://picsum.photos/seed/reclassic350/800/600',
+ 'auctions/reclassic350',
+ '["https://picsum.photos/seed/re1/800/600","https://picsum.photos/seed/re2/800/600"]'::jsonb,
+ '["auctions/re1","auctions/re2"]'::jsonb,
  NOW()-INTERVAL '1 day', NOW()+INTERVAL '5 days', NOW(), NULL),
 
 -- 4
@@ -47,6 +64,10 @@ INSERT INTO auctions (
  150000,
  'kc-104','Neha Verma','neha@gmail.com','+91-9000000004',
  'DRAFT',
+ 'https://picsum.photos/seed/gamingpc/800/600',
+ 'auctions/gamingpc',
+ '["https://picsum.photos/seed/gamingpc1/800/600","https://picsum.photos/seed/gamingpc2/800/600"]'::jsonb,
+ '["auctions/gamingpc1","auctions/gamingpc2"]'::jsonb,
  NOW()-INTERVAL '8 days', NOW()-INTERVAL '2 days', NOW(), NOW()-INTERVAL '2 days'),
 
 -- 5
@@ -56,6 +77,10 @@ INSERT INTO auctions (
  78000,
  'kc-105','Amit Patel','amit@gmail.com','+91-9000000005',
  'DRAFT',
+ 'https://picsum.photos/seed/s23ultra/800/600',
+ 'auctions/s23ultra',
+ '["https://picsum.photos/seed/s231/800/600"]'::jsonb,
+ '["auctions/s231"]'::jsonb,
  NOW()-INTERVAL '5 hours', NOW()+INTERVAL '2 days', NOW(), NULL),
 
 -- 6
@@ -65,6 +90,10 @@ INSERT INTO auctions (
  45000,
  'kc-106','Karan Singh','karan@gmail.com','+91-9000000006',
  'DRAFT',
+ 'https://picsum.photos/seed/ps5/800/600',
+ 'auctions/ps5',
+ '["https://picsum.photos/seed/ps51/800/600"]'::jsonb,
+ '["auctions/ps51"]'::jsonb,
  NOW()+INTERVAL '2 days', NOW()+INTERVAL '7 days', NOW(), NULL),
 
 -- 7
@@ -74,6 +103,10 @@ INSERT INTO auctions (
  92000,
  'kc-107','Priya Nair','priya@gmail.com','+91-9000000007',
  'DRAFT',
+ 'https://picsum.photos/seed/canoneosr/800/600',
+ 'auctions/canoneosr',
+ '["https://picsum.photos/seed/canon1/800/600"]'::jsonb,
+ '["auctions/canon1"]'::jsonb,
  NOW()-INTERVAL '6 hours', NOW()+INTERVAL '4 days', NOW(), NULL),
 
 -- 8
@@ -83,6 +116,10 @@ INSERT INTO auctions (
  65000,
  'kc-108','Rahul Mehta','rahul@gmail.com','+91-9000000008',
  'DRAFT',
+ 'https://picsum.photos/seed/ipadm1/800/600',
+ 'auctions/ipadm1',
+ '["https://picsum.photos/seed/ipad1/800/600"]'::jsonb,
+ '["auctions/ipad1"]'::jsonb,
  NOW()-INTERVAL '12 days', NOW()-INTERVAL '6 days', NOW(), NOW()-INTERVAL '6 days'),
 
 -- 9
@@ -92,6 +129,10 @@ INSERT INTO auctions (
  55000,
  'kc-109','Sneha Iyer','sneha@gmail.com','+91-9000000009',
  'DRAFT',
+ 'https://picsum.photos/seed/oneplus11/800/600',
+ 'auctions/oneplus11',
+ '["https://picsum.photos/seed/op11/800/600"]'::jsonb,
+ '["auctions/op11"]'::jsonb,
  NOW()-INTERVAL '1 hour', NOW()+INTERVAL '1 day', NOW(), NULL),
 
 -- 10
@@ -101,6 +142,10 @@ INSERT INTO auctions (
  110000,
  'kc-110','Arjun Rao','arjun@gmail.com','+91-9000000010',
  'DRAFT',
+ 'https://picsum.photos/seed/dellxps/800/600',
+ 'auctions/dellxps',
+ '["https://picsum.photos/seed/dell1/800/600"]'::jsonb,
+ '["auctions/dell1"]'::jsonb,
  NOW()+INTERVAL '3 days', NOW()+INTERVAL '8 days', NOW(), NULL),
 
 -- 11
@@ -110,6 +155,10 @@ INSERT INTO auctions (
  28000,
  'kc-111','Pooja Malhotra','pooja@gmail.com','+91-9000000011',
  'DRAFT',
+ 'https://picsum.photos/seed/sonyxm5/800/600',
+ 'auctions/sonyxm5',
+ '["https://picsum.photos/seed/sony1/800/600"]'::jsonb,
+ '["auctions/sony1"]'::jsonb,
  NOW()-INTERVAL '30 minutes', NOW()+INTERVAL '1 day', NOW(), NULL),
 
 -- 12
@@ -119,6 +168,10 @@ INSERT INTO auctions (
  72000,
  'kc-112','Nikhil Jain','nikhil@gmail.com','+91-9000000012',
  'DRAFT',
+ 'https://picsum.photos/seed/applewatch/800/600',
+ 'auctions/applewatch',
+ '["https://picsum.photos/seed/watch1/800/600"]'::jsonb,
+ '["auctions/watch1"]'::jsonb,
  NOW()-INTERVAL '7 days', NOW()-INTERVAL '1 day', NOW(), NOW()-INTERVAL '1 day'),
 
 -- 13
@@ -128,6 +181,10 @@ INSERT INTO auctions (
  42000,
  'kc-113','Meera Joshi','meera@gmail.com','+91-9000000013',
  'DRAFT',
+ 'https://picsum.photos/seed/gopro11/800/600',
+ 'auctions/gopro11',
+ '["https://picsum.photos/seed/gopro1/800/600"]'::jsonb,
+ '["auctions/gopro1"]'::jsonb,
  NOW()-INTERVAL '3 hours', NOW()+INTERVAL '2 days', NOW(), NULL),
 
 -- 14
@@ -137,6 +194,10 @@ INSERT INTO auctions (
  21000,
  'kc-114','Vikas Khanna','vikas@gmail.com','+91-9000000014',
  'DRAFT',
+ 'https://picsum.photos/seed/airpodspro2/800/600',
+ 'auctions/airpodspro2',
+ '["https://picsum.photos/seed/airpods1/800/600"]'::jsonb,
+ '["auctions/airpods1"]'::jsonb,
  NOW()+INTERVAL '1 day', NOW()+INTERVAL '5 days', NOW(), NULL),
 
 -- 15
@@ -146,4 +207,8 @@ INSERT INTO auctions (
  135000,
  'kc-115','Harsha Vardhan','harsha@gmail.com','+91-9000000015',
  'DRAFT',
+ 'https://picsum.photos/seed/asusrog/800/600',
+ 'auctions/asusrog',
+ '["https://picsum.photos/seed/asus1/800/600","https://picsum.photos/seed/asus2/800/600"]'::jsonb,
+ '["auctions/asus1","auctions/asus2"]'::jsonb,
  NOW()-INTERVAL '4 hours', NOW()+INTERVAL '6 days', NOW(), NULL);

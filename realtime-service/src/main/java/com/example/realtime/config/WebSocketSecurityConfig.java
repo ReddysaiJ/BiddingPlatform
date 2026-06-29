@@ -18,10 +18,9 @@ public class WebSocketSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(a -> a
-                        .requestMatchers(request ->
-                                "true".equals(request.getHeader("X-Trusted-Gateway"))
-                        ).permitAll()
-                        .anyRequest().denyAll()
+                    .requestMatchers("/ws").permitAll()
+                    .requestMatchers("/ws/**").permitAll()
+                    .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(new JwtAuthenticationConverter()))

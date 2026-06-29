@@ -2,10 +2,14 @@ package com.example.auction.domain;
 
 import com.example.auction.domain.models.AuctionStatus;
 import com.example.auction.domain.models.Customer;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Type;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -41,6 +45,20 @@ public class AuctionEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AuctionStatus status;
+
+    @Column(name = "base_image_url")
+    private String baseImageUrl;
+
+    @Column(name = "base_public_id")
+    private String basePublicId;
+
+    @Type(JsonType.class)
+    @Column(name = "image_urls", columnDefinition = "jsonb")
+    private List<String> imageUrls = new ArrayList<>();
+
+    @Type(JsonType.class)
+    @Column(name = "image_public_ids", columnDefinition = "jsonb")
+    private List<String> imagePublicIds = new ArrayList<>();
 
     @Column(nullable = false)
     private LocalDateTime startTime;
@@ -105,6 +123,22 @@ public class AuctionEntity {
         this.status = status;
     }
 
+    public String getBaseImageUrl() {
+        return baseImageUrl;
+    }
+
+    public void setBaseImageUrl(String baseImageUrl) {
+        this.baseImageUrl = baseImageUrl;
+    }
+
+    public String getBasePublicId() {
+        return basePublicId;
+    }
+
+    public void setBasePublicId(String basePublicId) {
+        this.basePublicId = basePublicId;
+    }
+
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
@@ -166,6 +200,14 @@ public class AuctionEntity {
 
     public AuctionStatus getStatus() {
         return status;
+    }
+
+    public List<String> getImagePublicIds() {
+        return imagePublicIds;
+    }
+
+    public List<String> getImageUrls() {
+        return imageUrls;
     }
 
     public LocalDateTime getStartTime() {

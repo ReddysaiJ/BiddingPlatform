@@ -25,6 +25,10 @@ public record CreateAuctionRequest(
 
         @NotNull(message = "End time is required")
         @Future(message = "End time must be in the future")
-        LocalDateTime endTime
+        LocalDateTime endTime,
+
+        String baseImageUrl,
+
+        String basePublicId
 ) {
 }

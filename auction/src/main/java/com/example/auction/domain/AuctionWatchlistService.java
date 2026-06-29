@@ -1,16 +1,20 @@
 package com.example.auction.domain;
 
 import com.example.auction.ApplicationProperties;
+import com.example.auction.domain.exception.AuctionNotFoundException;
 import com.example.auction.domain.models.AuctionResponse;
 import com.example.auction.domain.models.Customer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.UUID;
@@ -22,29 +26,35 @@ public class AuctionWatchlistService {
 
     private final AuctionWatchlistRepository auctionWatchlistRepository;
     private final ApplicationProperties properties;
-    private final AuctionService auctionService;
+    private final AuctionRepository auctionRepository;
     private final UserService userService;
 
-    public AuctionWatchlistService(AuctionWatchlistRepository auctionWatchlistRepository, ApplicationProperties properties, AuctionService auctionService, UserService userService) {
+    public AuctionWatchlistService(AuctionWatchlistRepository auctionWatchlistRepository, ApplicationProperties properties, AuctionRepository auctionRepository, UserService userService) {
         this.auctionWatchlistRepository = auctionWatchlistRepository;
         this.properties = properties;
-        this.auctionService = auctionService;
+        this.auctionRepository = auctionRepository;
         this.userService = userService;
     }
 
+    @Transactional
     public Customer removeFromWatchlist(UUID uid) {
         log.info("Deleting auction from watchlist");
         Customer user = userService.getSeller();
-        AuctionEntity auctionEntity = auctionService.getAuction(uid);
+        AuctionEntity auctionEntity = auctionRepository.findByUid(uid)
+                                        .orElseThrow(() -> new AuctionNotFoundException(
+                                                "Auction Not Found With UID : " + uid));
         auctionWatchlistRepository.findByUserIdAndAuction_Id(user.id(), auctionEntity.getId())
                 .ifPresent(auctionWatchlistRepository::delete);
         return user;
     }
 
+    @Transactional
     public Customer addToWatchlist(UUID uid) {
         log.info("Adding auction to watchlist");
         Customer user = userService.getSeller();
-        AuctionEntity auctionEntity = auctionService.getAuction(uid);
+        AuctionEntity auctionEntity = auctionRepository.findByUid(uid)
+                                        .orElseThrow(() -> new AuctionNotFoundException(
+                                                "Auction Not Found With UID : " + uid));
         if (auctionWatchlistRepository.existsByUserIdAndAuction_Uid(user.id(), uid))
             return user;
 
@@ -52,6 +62,7 @@ public class AuctionWatchlistService {
         return user;
     }
 
+    @Transactional(readOnly = true)
     public PagedResult<AuctionResponse> getAuctions(int pageNo, String sortBy, String direction) {
         log.info("Fetching watchlist auctions");
         Set<String> allowedSort = Set.of("title", "startTime", "endTime", "basePrice", "status");
@@ -86,4 +97,14 @@ public class AuctionWatchlistService {
                 auctionEntityPage.hasPrevious()
         );
     }
+
+    protected boolean isWatched(String userId, UUID uid) {
+        return auctionWatchlistRepository.existsByUserIdAndAuction_Uid(userId, uid);
+    }
+
+    @Transactional(readOnly = true)
+    protected Set<UUID> getWatchedUids(String userId) {
+        return auctionWatchlistRepository.findAuctionIdsByCustomerId(userId);
+    }
+
 }

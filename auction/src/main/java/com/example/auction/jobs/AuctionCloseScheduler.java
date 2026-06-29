@@ -18,15 +18,17 @@ public class AuctionCloseScheduler {
     private static final Logger log = LoggerFactory.getLogger(AuctionCloseScheduler.class);
 
     private final AuctionRepository auctionRepository;
+    private final AuctionReadCacheService auctionReadCacheService;
     private final AuctionOutboxEventRepository outboxRepository;
 
-    public AuctionCloseScheduler(AuctionRepository auctionRepository, AuctionOutboxEventRepository outboxRepository) {
+    public AuctionCloseScheduler(AuctionRepository auctionRepository, AuctionReadCacheService auctionReadCacheService, AuctionOutboxEventRepository outboxRepository) {
         this.auctionRepository = auctionRepository;
+        this.auctionReadCacheService = auctionReadCacheService;
         this.outboxRepository = outboxRepository;
     }
 
     @Transactional
-    @Scheduled(cron = "*/10 * * * * *")
+    @Scheduled(cron = "0 */5 * * * *")
     public void closeAuctions() {
         List<AuctionEntity> auctions = auctionRepository.findOpenAuctionsPastEndTime();
         if (auctions.isEmpty())
@@ -41,5 +43,7 @@ public class AuctionCloseScheduler {
 
             log.info("Auction closed | auctionId={}", auction.getUid());
         }
+        auctionReadCacheService.evictOpenCache();
+        auctionReadCacheService.evictClosedCache();
     }
 }

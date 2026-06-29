@@ -18,18 +18,19 @@ public class AuctionOpenScheduler {
     private static final Logger log = LoggerFactory.getLogger(AuctionOpenScheduler.class);
 
     private final AuctionRepository auctionRepository;
+    private final AuctionReadCacheService auctionReadCacheService;
     private final AuctionOutboxEventRepository outboxRepository;
 
-    public AuctionOpenScheduler(AuctionRepository auctionRepository,
+    public AuctionOpenScheduler(AuctionRepository auctionRepository, AuctionReadCacheService auctionReadCacheService,
                                 AuctionOutboxEventRepository outboxRepository) {
         this.auctionRepository = auctionRepository;
+        this.auctionReadCacheService = auctionReadCacheService;
         this.outboxRepository = outboxRepository;
     }
 
     @Transactional
-    @Scheduled(cron = "*/10 * * * * *")
+    @Scheduled(cron = "0 */5 * * * *")
     public void openAuctions() {
-
         List<AuctionEntity> auctions = auctionRepository.findDraftStartedAuctions();
 
         if (auctions.isEmpty())
@@ -48,5 +49,6 @@ public class AuctionOpenScheduler {
                 log.error("Failed to open auction {}", auction.getUid(), ex);
             }
         }
+        auctionReadCacheService.evictOpenCache();
     }
 }

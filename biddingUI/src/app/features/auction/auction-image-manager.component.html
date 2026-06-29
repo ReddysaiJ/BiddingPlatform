@@ -1,0 +1,54 @@
+<div class="card p-3">
+    <h6 class="mb-3">Gallery Images</h6>
+
+    <!-- Current images -->
+    @if (images.length > 0) {
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            @for (img of images; track img) {
+                <div class="position-relative">
+                    <img
+                        [src]="img"
+                        style="width: 100px; height: 100px; object-fit: cover"
+                        class="rounded border"
+                    />
+                </div>
+            }
+        </div>
+    } @else {
+        <p class="text-muted small">No gallery images yet.</p>
+    }
+
+    <!-- Upload new images -->
+    <div class="mb-2">
+        <input
+            type="file"
+            multiple
+            accept="image/*"
+            (change)="onFilesSelected($event)"
+            class="form-control form-control-sm"
+            #fileInput
+        />
+    </div>
+
+    @if (selectedFiles.length > 0) {
+        <div class="d-flex flex-wrap gap-2 mb-2">
+            @for (preview of previews; track preview) {
+                <img
+                    [src]="preview"
+                    style="width: 80px; height: 80px; object-fit: cover"
+                    class="rounded border border-success"
+                />
+            }
+        </div>
+        <button class="btn btn-sm btn-primary" [disabled]="uploading" (click)="uploadImages()">
+            {{ uploading ? 'Uploading...' : 'Upload ' + selectedFiles.length + ' image(s)' }}
+        </button>
+    }
+
+    @if (uploadError) {
+        <p class="text-danger small mt-1">{{ uploadError }}</p>
+    }
+    @if (uploadSuccess) {
+        <p class="text-success small mt-1">Images uploaded successfully.</p>
+    }
+</div>

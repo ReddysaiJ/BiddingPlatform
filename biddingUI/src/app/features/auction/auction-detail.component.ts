@@ -35,6 +35,9 @@ export class AuctionDetailComponent implements OnInit, OnDestroy {
     pulse = false;
     connected = false;
 
+    selectedImage = '';
+    allImages: string[] = [];
+
     private subscriptions: Subscription[] = [];
 
     constructor(
@@ -54,10 +57,23 @@ export class AuctionDetailComponent implements OnInit, OnDestroy {
 
     loadAuction(): void {
         this.loading = true;
+
         this.auctionService.getAuctionById(this.auctionId).subscribe({
             next: (response) => {
                 this.auction = response;
                 this.status = response.status;
+
+                // this.allImages = [];
+
+                if (response.baseImageUrl) {
+                    this.allImages.push(response.baseImageUrl);
+                }
+
+                this.selectedImage =
+                    this.allImages.length > 0
+                        ? this.allImages[0]
+                        : 'https://via.placeholder.com/800x500?text=No+Image';
+
                 this.loading = false;
                 this.cdr.markForCheck();
             },
@@ -66,6 +82,23 @@ export class AuctionDetailComponent implements OnInit, OnDestroy {
                 this.cdr.markForCheck();
             },
         });
+
+        this.auctionService.getImagesByUid(this.auctionId).subscribe({
+            next: (response) => {
+                if(response.imageUrls)
+                    this.allImages.push(...response.imageUrls);
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                console.warn("Load images error");
+                this.cdr.markForCheck();
+            }
+        })
+    }
+
+    selectImage(image: string): void {
+        this.selectedImage = image;
+        this.cdr.markForCheck();
     }
 
     loadRealtimeSnapshot(): void {

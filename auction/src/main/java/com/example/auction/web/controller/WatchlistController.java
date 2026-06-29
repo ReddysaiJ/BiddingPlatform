@@ -32,7 +32,7 @@ public class WatchlistController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> watch(UUID uid) {
+    public ResponseEntity<Void> watch(UUID uid, Long id) {
         Customer user = auctionWatchlistService.addToWatchlist(uid);
         log.info("Watchlist updated with {} for user {}", uid, user.id());
         return ResponseEntity.ok().build();

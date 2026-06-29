@@ -1,10 +1,7 @@
 package com.example.auction.domain;
 
-import aj.org.objectweb.asm.commons.Remapper;
-import com.example.auction.domain.models.AuctionDTO;
-import com.example.auction.domain.models.AuctionResponse;
+import com.example.auction.domain.models.AuctionCacheResponse;
 import com.example.auction.domain.models.AuctionStatus;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,118 +15,99 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface AuctionRepository extends JpaRepository<AuctionEntity, Long> {
-
+    // ── Single auction lookup ─────────────────────────────────────────────────
     @Query("""
-        select new com.example.auction.domain.models.AuctionResponse(
+        SELECT new com.example.auction.domain.models.AuctionCacheResponse(
             a.uid,
             a.title,
             a.description,
             a.basePrice,
             a.seller.name,
             a.status,
+            a.baseImageUrl,
             a.startTime,
             a.endTime,
-    
-            case
-                when w.id is not null
-                then true
-                else false
-            end,
-    
-            a.createdAt,
-            a.updatedAt
-        )
-    
-        from AuctionEntity a
-    
-        left join WatchlistEntity w
-            on w.auction.uid = a.uid
-            and w.userId = :userId
-    
-        where a.uid = :uid
-    """)
-    Optional<AuctionResponse> findResponseByUid(@Param("uid") UUID uid, @Param("userId") String userId);
-
-    Optional<AuctionEntity> findByUid(UUID uid);
-
-        @Query("""
-        SELECT new com.example.auction.domain.models.AuctionResponse(
-            a.uid,
-            a.title,
-            a.description,
-            a.basePrice,
-            a.seller.name,
-            a.status,
-            a.startTime,
-            a.endTime,
-            CASE WHEN w.id IS NOT NULL THEN true ELSE false END,
             a.createdAt,
             a.updatedAt
         )
         FROM AuctionEntity a
-        LEFT JOIN WatchlistEntity w
-            ON w.auction.uid = a.uid
-           AND w.userId = :userId
-        WHERE a.seller.id = :sellerId
+        WHERE a.uid = :uid
     """)
-    Page<AuctionResponse> findBySellerId(Pageable pageable, @Param("sellerId") String sellerId, @Param("userId") String userId);
+    Optional<AuctionCacheResponse> findCacheResponseByUid(@Param("uid") UUID uid);
 
-//    @Query("""
-//            select new com.example.auction.domain.models.AuctionDTO(
-//            a.uid,
-//            a.status,
-//            a.seller.id,
-//            a.basePrice
-//        )
-//        from AuctionEntity a
-//        where a.uid = :uid
-//        """)
-//    Optional<AuctionDTO> findDTOByUid(UUID uid);
+    Optional<AuctionEntity> findByUid(UUID uid);
 
+    // ── Paginated list — all auctions by status ───────────────────────────────
     @Query("""
-        select a from AuctionEntity a
-        where a.status = 'DRAFT'
-          and a.startTime <= CURRENT_TIMESTAMP
-    """)
-    List<AuctionEntity> findDraftStartedAuctions();
-
-    @Modifying
-    @Query("""
-        update AuctionEntity a
-        set a.status = 'COMPLETED',
-            a.winnerId = :winner,
-            a.winningAmount = :price
-        where a.uid = :auctionId
-    """)
-    void markCompleted(UUID auctionId, String winner, BigDecimal price);
-
-    @Query("""
-        select a from AuctionEntity a
-        where a.status = com.example.auction.domain.models.AuctionStatus.OPEN
-          and a.endTime <= CURRENT_TIMESTAMP
-    """)
-    List<AuctionEntity> findOpenAuctionsPastEndTime();
-
-    @Query("""
-        SELECT new com.example.auction.domain.models.AuctionResponse(
+        SELECT new com.example.auction.domain.models.AuctionCacheResponse(
             a.uid,
             a.title,
             a.description,
             a.basePrice,
             a.seller.name,
             a.status,
+            a.baseImageUrl,
             a.startTime,
             a.endTime,
-            CASE
-                WHEN EXISTS (
-                    SELECT 1
-                    FROM WatchlistEntity w
-                    WHERE w.auction.uid = a.uid
-                      AND w.userId = :userId
-                )
-                THEN true
-                ELSE false
-            END,
+            a.createdAt,
+            a.updatedAt
+        )
+        FROM AuctionEntity a
+        WHERE (:status IS NULL OR a.status = :status)
+    """)
+    Page<AuctionCacheResponse> findAllByStatus(@Param("status") AuctionStatus status, Pageable pageable);
+
+    // ── Paginated list — all auctions, no status filter ──────────────────────
+    @Query("""
+        SELECT new com.example.auction.domain.models.AuctionCacheResponse(
+            a.uid,
+            a.title,
+            a.description,
+            a.basePrice,
+            a.seller.name,
+            a.status,
+            a.baseImageUrl,
+            a.startTime,
+            a.endTime,
+            a.createdAt,
+            a.updatedAt
+        )
+        FROM AuctionEntity a
+    """)
+    Page<AuctionCacheResponse> findAllCached(Pageable pageable);
+
+    // ── Paginated list — by seller ────────────────────────────────────────────
+    @Query("""
+        SELECT new com.example.auction.domain.models.AuctionCacheResponse(
+            a.uid,
+            a.title,
+            a.description,
+            a.basePrice,
+            a.seller.name,
+            a.status,
+            a.baseImageUrl,
+            a.startTime,
+            a.endTime,
+            a.createdAt,
+            a.updatedAt
+        )
+        FROM AuctionEntity a
+        WHERE a.seller.id = :sellerId
+    """)
+    Page<AuctionCacheResponse> findBySellerId(@Param("sellerId") String sellerId, Pageable pageable);
+
+    // ── Search — by title, with optional status filter ────────────────────────
+    @Query("""
+        SELECT new com.example.auction.domain.models.AuctionCacheResponse(
+            a.uid,
+            a.title,
+            a.description,
+            a.basePrice,
+            a.seller.name,
+            a.status,
+            a.baseImageUrl,
+            a.startTime,
+            a.endTime,
             a.createdAt,
             a.updatedAt
         )
@@ -137,50 +115,40 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Long> {
         WHERE LOWER(a.title) LIKE LOWER(CONCAT('%', :title, '%'))
           AND (:status IS NULL OR a.status = :status)
     """)
-    Page<AuctionResponse> findByTitleContainingIgnoreCaseForCustomer(String title, String userId, AuctionStatus status, Pageable pageable);
+    Page<AuctionCacheResponse> findByTitleContainingIgnoreCase(@Param("title") String title, @Param("status") AuctionStatus status, Pageable pageable);
 
+    // ── Search — by title, no status filter ──────────────────────────────────
     @Query("""
-        SELECT new com.example.auction.domain.models.AuctionResponse(
+        SELECT new com.example.auction.domain.models.AuctionCacheResponse(
             a.uid,
             a.title,
             a.description,
             a.basePrice,
             a.seller.name,
             a.status,
+            a.baseImageUrl,
             a.startTime,
             a.endTime,
-            CASE WHEN w.id IS NOT NULL THEN true ELSE false END,
             a.createdAt,
             a.updatedAt
         )
         FROM AuctionEntity a
-        LEFT JOIN WatchlistEntity w
-            ON w.auction.uid = a.uid
-           AND w.userId = :userId
         WHERE LOWER(a.title) LIKE LOWER(CONCAT('%', :title, '%'))
     """)
-    Page<AuctionResponse> findByTitleContainingIgnoreCase(String title, String userId, Pageable pageable);
+    Page<AuctionCacheResponse> findByTitleContainingIgnoreCaseAll(@Param("title") String title, Pageable pageable);
 
+    // ── Search — by seller + title ────────────────────────────────────────────
     @Query("""
-        SELECT new com.example.auction.domain.models.AuctionResponse(
+        SELECT new com.example.auction.domain.models.AuctionCacheResponse(
             a.uid,
             a.title,
             a.description,
             a.basePrice,
             a.seller.name,
             a.status,
+            a.baseImageUrl,
             a.startTime,
             a.endTime,
-            CASE
-                WHEN EXISTS (
-                    SELECT w
-                    FROM WatchlistEntity w
-                    WHERE w.auction.uid = a.uid
-                      AND w.userId = :userId
-                )
-                THEN true
-                ELSE false
-            END,
             a.createdAt,
             a.updatedAt
         )
@@ -188,48 +156,31 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Long> {
         WHERE a.seller.id = :sellerId
           AND LOWER(a.title) LIKE LOWER(CONCAT('%', :title, '%'))
     """)
-    Page<AuctionResponse> findBySellerIdAndTitleContainingIgnoreCase(String userId, String title, Pageable pageable, String customerId);
+    Page<AuctionCacheResponse> findBySellerIdAndTitleContainingIgnoreCase(@Param("sellerId") String sellerId, @Param("title") String title, Pageable pageable);
+
+    // ── Scheduler queries — unchanged, return entities ────────────────────────
+    @Query("""
+        SELECT a FROM AuctionEntity a
+        WHERE a.status = 'DRAFT'
+          AND a.startTime <= CURRENT_TIMESTAMP
+    """)
+    List<AuctionEntity> findDraftStartedAuctions();
 
     @Query("""
-        SELECT new com.example.auction.domain.models.AuctionResponse(
-            a.uid,
-            a.title,
-            a.description,
-            a.basePrice,
-            a.seller.name,
-            a.status,
-            a.startTime,
-            a.endTime,
-            CASE WHEN w.id IS NOT NULL THEN true ELSE false END,
-            a.createdAt,
-            a.updatedAt
-        )
-        FROM AuctionEntity a
-        LEFT JOIN WatchlistEntity w
-            ON w.auction = a
-           AND w.userId = :userId
-        WHERE (:status IS NULL OR a.status = :status)
+        SELECT a FROM AuctionEntity a
+        WHERE a.status = com.example.auction.domain.models.AuctionStatus.OPEN
+          AND a.endTime <= CURRENT_TIMESTAMP
     """)
-    Page<AuctionResponse> findAllForCustomer(@Param("userId") String userId, @Param("status") AuctionStatus status, Pageable pageable);
+    List<AuctionEntity> findOpenAuctionsPastEndTime();
 
+    // ── Mutations ─────────────────────────────────────────────────────────────
+    @Modifying
     @Query("""
-        SELECT new com.example.auction.domain.models.AuctionResponse(
-            a.uid,
-            a.title,
-            a.description,
-            a.basePrice,
-            a.seller.name,
-            a.status,
-            a.startTime,
-            a.endTime,
-            CASE WHEN w.id IS NOT NULL THEN true ELSE false END,
-            a.createdAt,
-            a.updatedAt
-        )
-        FROM AuctionEntity a
-        LEFT JOIN WatchlistEntity w
-            ON w.auction = a
-           AND w.userId = :userId
+        UPDATE AuctionEntity a
+        SET a.status = 'COMPLETED',
+            a.winnerId = :winner,
+            a.winningAmount = :price
+        WHERE a.uid = :auctionId
     """)
-    Page<AuctionResponse> findAllWithWatchStatus(@Param("userId") String userId, Pageable pageable);
+    void markCompleted(@Param("auctionId") UUID auctionId, @Param("winner") String winner, @Param("price") BigDecimal price);
 }

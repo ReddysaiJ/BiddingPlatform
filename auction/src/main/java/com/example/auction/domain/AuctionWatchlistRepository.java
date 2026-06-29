@@ -19,6 +19,7 @@ interface AuctionWatchlistRepository extends JpaRepository<WatchlistEntity, Long
             a.uid, a.title,
             a.description, a.basePrice,
             a.seller.name, a.status,
+            a.baseImageUrl,
             a.startTime, a.endTime,
             true,
             a.createdAt, a.updatedAt

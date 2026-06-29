@@ -13,6 +13,7 @@ public class AuctionMapper {
                 auctionEntity.getBasePrice(),
                 auctionEntity.getSeller().name(),
                 auctionEntity.getStatus(),
+                auctionEntity.getBaseImageUrl(),
                 auctionEntity.getStartTime(),
                 auctionEntity.getEndTime(),
                 watch,

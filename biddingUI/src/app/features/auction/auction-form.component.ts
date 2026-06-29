@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuctionService } from '../../core/services/auction.service';
 import { CreateAuctionRequest } from '../../core/models/createAuctionRequest.model';
 import { UpdateAuctionRequest } from '../../core/models/updateAuctionRequest.model';
+import { AuctionImageManagerComponent } from "./auction-image-manager.component";
 
 interface CalCell {
     day: number;
@@ -20,7 +21,7 @@ interface CalCell {
 @Component({
     selector: 'app-auction-form',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, AuctionImageManagerComponent],
     templateUrl: './auction-form.component.html',
     styles: [
         `
@@ -203,6 +204,10 @@ export class AuctionFormComponent implements OnInit, OnDestroy {
     errorMessage = '';
     isEdit = false;
     auctionUid = '';
+
+    selectedImage: File | null = null;
+    imagePreview = '';
+    uploadingImage = false;
 
     // Picker state
     activePickerStart = false;
@@ -577,6 +582,7 @@ export class AuctionFormComponent implements OnInit, OnDestroy {
                     startTime: auction.startTime,
                     endTime: auction.endTime,
                 };
+                this.imagePreview = auction.baseImageUrl || '';
                 this.loading = false;
                 this.cdr.detectChanges();
             },
@@ -615,16 +621,46 @@ export class AuctionFormComponent implements OnInit, OnDestroy {
 
     createAuction(): void {
         this.loading = true;
+
+        if (this.selectedImage) {
+            this.uploadingImage = true;
+
+            this.auctionService
+                .uploadBaseImage(this.selectedImage)
+                .subscribe({
+                    next: (response) => {
+                        this.request.baseImageUrl = response.secureUrl;
+                        this.request.basePublicId = response.publicId;
+
+                        this.saveAuction();
+                    },
+                    error: () => {
+                        this.loading = false;
+                        this.uploadingImage = false;
+                        this.errorMessage = 'Image upload failed';
+                        this.cdr.detectChanges();
+                    }
+                });
+        } else {
+            this.saveAuction();
+        }
+    }
+
+    private saveAuction(): void {
         this.auctionService.createAuction(this.request).subscribe({
             next: () => {
                 this.loading = false;
+                this.uploadingImage = false;
                 this.router.navigate(['/my-auctions']);
             },
             error: (err) => {
                 this.loading = false;
-                this.errorMessage = err.error?.message ?? 'Failed to create auction';
+                this.uploadingImage = false;
+                this.errorMessage =
+                    err.error?.message ?? 'Failed to create auction';
+
                 this.cdr.detectChanges();
-            },
+            }
         });
     }
 
@@ -649,5 +685,43 @@ export class AuctionFormComponent implements OnInit, OnDestroy {
                 this.cdr.detectChanges();
             },
         });
+    }
+
+    onImageSelected(event: Event): void {
+        const input = event.target as HTMLInputElement;
+
+        if (!input.files || input.files.length === 0) {
+            return;
+        }
+
+        const file = input.files[0];
+
+        if (!file.type.startsWith('image/')) {
+            this.errorMessage = 'Please select an image file';
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            this.errorMessage = 'Image size cannot exceed 5 MB';
+            return;
+        }
+
+        this.selectedImage = file;
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            this.imagePreview = reader.result as string;
+            this.cdr.detectChanges();
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+    removeImage(): void {
+        this.selectedImage = null;
+        this.imagePreview = '';
+        this.request.baseImageUrl = '';
+        this.request.basePublicId = '';
     }
 }

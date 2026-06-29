@@ -32,19 +32,26 @@ public class AuctionController {
     public PagedResult<AuctionResponse> getAuctions(@RequestParam(name = "page", defaultValue = "1") int pageNo,
                                                 @RequestParam(name = "sortBy", defaultValue = "startTime") String sortBy,
                                                 @RequestParam(name = "direction", defaultValue = "asc") String direction,
-                                                @RequestParam(name = "query", defaultValue = "") String query,
                                                 @RequestParam(name = "status", defaultValue = "OPEN") AuctionStatus status){
         log.info("Fetching Auctions status...");
-        return auctionService.getAuctions(pageNo, sortBy, direction, query, status);
+        return auctionService.getAuctions(pageNo, sortBy, direction, status);
     }
 
     @GetMapping
     public PagedResult<AuctionResponse> getAllAuctions(@RequestParam(name = "page", defaultValue = "1") int pageNo,
                                                 @RequestParam(name = "sortBy", defaultValue = "startTime") String sortBy,
-                                                @RequestParam(name = "direction", defaultValue = "asc") String direction,
-                                                @RequestParam(name = "query", defaultValue = "") String query){
+                                                @RequestParam(name = "direction", defaultValue = "asc") String direction){
         log.info("Fetching Auctions...");
-        return auctionService.getAllAuctions(pageNo, sortBy, direction, query, "");
+        return auctionService.getAllAuctions(pageNo, sortBy, direction);
+    }
+
+    @GetMapping("/search")
+    public PagedResult<AuctionResponse> getSearchAuctions(@RequestParam(name = "query", defaultValue = "") String query,
+                                                    @RequestParam(name = "page", defaultValue = "1") int pageNo,
+                                                    @RequestParam(name = "sortBy", defaultValue = "startTime") String sortBy,
+                                                    @RequestParam(name = "direction", defaultValue = "asc") String direction){
+        log.info("Searching Auctions for query: {}", query);
+        return auctionService.getAllAuctionsByQuery(pageNo, sortBy, direction, query);
     }
 
     @GetMapping("/my")
@@ -53,8 +60,8 @@ public class AuctionController {
                                               @RequestParam(name = "direction", defaultValue = "asc") String direction,
                                               @RequestParam(name = "query", defaultValue = "") String query){
         Customer user = userService.getSeller();
-        log.info("Fetching Auctions for user : {}", user.id());
-        return auctionService.getAllAuctions(pageNo, sortBy, direction, query, user.id());
+        log.info("Fetching Auctions of user : {}", user.id());
+        return auctionService.getAllMyAuctions(pageNo, sortBy, direction, query, user.id());
     }
 
     @GetMapping("/{uid}")

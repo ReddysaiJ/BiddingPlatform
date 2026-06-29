@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public record AuctionResponse(
+public record AuctionCacheResponse(
         UUID uid,
         String title,
         String description,
@@ -15,7 +15,6 @@ public record AuctionResponse(
         String baseImageUrl,
         LocalDateTime startTime,
         LocalDateTime endTime,
-        boolean watched,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {

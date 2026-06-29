@@ -15,6 +15,9 @@ export class TokenInterceptor implements HttpInterceptor{
             return next.handle(req);
         }
 
+        if (req.url.includes('api.cloudinary.com'))
+            return next.handle(req);
+
         const token = this.authService.getAccessToken();
         console.log(
             'REQUEST:',
