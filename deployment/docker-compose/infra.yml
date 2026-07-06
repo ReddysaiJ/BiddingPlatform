@@ -43,6 +43,25 @@ services:
         limits:
           memory: 500m
 
+  chat-db:
+    image: postgres:15-alpine
+    container_name: chat-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1212
+      - POSTGRES_DB=postgres
+    ports:
+      - "35432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 500m
+
   bidding-rabbitmq:
     image: rabbitmq:3.12.11-management
     container_name: bidding-rabbitmq

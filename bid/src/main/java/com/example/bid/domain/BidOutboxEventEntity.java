@@ -1,7 +1,6 @@
 package com.example.bid.domain;
 
 import com.example.bid.domain.models.AuctionEventType;
-import com.example.bid.domain.models.HighestBidDTO;
 import com.example.bid.domain.models.OutboxStatus;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
@@ -28,7 +27,7 @@ public class BidOutboxEventEntity {
 
     @Type(JsonBinaryType.class)
     @Column(name = "payload", columnDefinition = "jsonb", nullable = false)
-    private HighestBidDTO payload;
+    private Object payload;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -42,7 +41,7 @@ public class BidOutboxEventEntity {
     public BidOutboxEventEntity(
             UUID auctionId,
             AuctionEventType eventType,
-            HighestBidDTO payload,
+            Object payload,
             OutboxStatus status
     ) {
         this.auctionId = auctionId;
@@ -64,7 +63,7 @@ public class BidOutboxEventEntity {
         return eventType;
     }
 
-    public HighestBidDTO getPayload() {
+    public Object getPayload() {
         return payload;
     }
 

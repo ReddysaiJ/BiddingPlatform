@@ -233,17 +233,22 @@ public class AuctionService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('INTERNAL')")
     public void declareWinner(UUID auctionId, String winner, BigDecimal price) {
         AuctionEntity auction = auctionRepository.findByUid(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException("Auction not found"));
 
-        if (auction.getWinnerId() != null)
+        if (auction.getWinnerId() != null){
+            log.info("Winner already declared for auctionId={}, skipping", auctionId);
             return;
+        }
 
         auctionRepository.markCompleted(auctionId, winner, price);
-        publishEvent(AuctionEventType.AUCTION_WINNER_DECLARED,
-                auctionId, new AuctionWinnerDeclaredEvent(auctionId, winner, price));
+
+        publishEvent(AuctionEventType.AUCTION_WINNER_DECLARED, auctionId,
+                new AuctionWinnerDeclaredEvent(auctionId, winner, auction.getSeller().id(), price));
+
+        log.info("Winner declared | auctionId={} | winner={} | seller={} | price={}",
+                auctionId, winner, auction.getSeller().id(), price);
     }
 
     private PagedResult<AuctionResponse> toPagedResult(PagedResult<AuctionCacheResponse> cacheResponse, String userId) {

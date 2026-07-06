@@ -6,5 +6,6 @@ import java.util.UUID;
 public record AuctionWinnerDeclaredEvent(
         UUID auctionId,
         String winnerUserId,
+        String sellerUserId,
         BigDecimal finalPrice
 ) {}

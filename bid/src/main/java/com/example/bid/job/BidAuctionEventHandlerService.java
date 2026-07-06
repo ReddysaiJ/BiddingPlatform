@@ -1,10 +1,7 @@
 package com.example.bid.job;
 
 import com.example.bid.domain.*;
-import com.example.bid.domain.models.AuctionEventDTO;
-import com.example.bid.domain.models.AuctionOpenEvent;
-import com.example.bid.domain.models.AuctionWinnerDeclaredEvent;
-import com.example.bid.domain.models.OutboxStatus;
+import com.example.bid.domain.models.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,16 +18,18 @@ public class BidAuctionEventHandlerService {
 
     private final OpenAuctionsRepository openAuctionsRepository;
     private final BidRepository bidRepository;
+    private final BidOutboxRepository bidOutboxRepository;
     private final ObjectMapper objectMapper;
     private final ProcessedEventRepository processedEventRepository;
 
     public BidAuctionEventHandlerService(
             OpenAuctionsRepository openAuctionsRepository,
-            BidRepository bidRepository,
+            BidRepository bidRepository, BidOutboxRepository bidOutboxRepository,
             ObjectMapper objectMapper,
             ProcessedEventRepository processedEventRepository) {
         this.openAuctionsRepository = openAuctionsRepository;
         this.bidRepository = bidRepository;
+        this.bidOutboxRepository = bidOutboxRepository;
         this.objectMapper = objectMapper;
         this.processedEventRepository = processedEventRepository;
     }
@@ -45,7 +44,7 @@ public class BidAuctionEventHandlerService {
             case AUCTION_UPDATED -> handleAuctionUpdated(event);
             case AUCTION_DELETED -> handleAuctionDeleted(event);
             case AUCTION_OPEN -> handleAuctionOpen(event);
-            case AUCTION_CLOSED -> handleAuctionClosedAndFinalizeAuction(event);
+            case AUCTION_CLOSED -> handleAuctionClosed(event);
             case AUCTION_WINNER_DECLARED -> handleAuctionWinnerDeclared(event);
             default -> throw new IllegalArgumentException("Unknown event type");
         }
@@ -71,18 +70,28 @@ public class BidAuctionEventHandlerService {
         log.info("AUCTION_DELETED | auctionId={} | eventId={}", event.auctionId(), event.eventId());
     }
 
-    private void handleAuctionClosedAndFinalizeAuction(AuctionEventDTO event) {
+    private void handleAuctionClosed(AuctionEventDTO event) {
         openAuctionsRepository.deleteById(event.auctionId());
-        bidRepository.findHighestBid(event.auctionId()).ifPresent(bid -> {
-            bidRepository.markWinner(bid.getId());
-//            try {
-//                auctionGateway.declareWinner(event.auctionId(), bid.getUserId(), bid.getAmount());
-//            } catch (Exception ex) {
-//                log.error("Failed to notify Auction service about winner", ex);
-//            }
-        });
 
-        log.info("AUCTION_CLOSED | auctionId={} | eventId={}", event.auctionId(), event.eventId());
+        bidRepository.findHighestBid(event.auctionId()).ifPresentOrElse(bid -> {
+            bidRepository.markWinner(bid.getId());
+
+            AuctionWinnerDeclaredEvent winnerPayload = new AuctionWinnerDeclaredEvent(
+                    bid.getAuctionId(),
+                    bid.getUserId(),
+                    bid.getAmount()
+            );
+            bidOutboxRepository.save(new BidOutboxEventEntity(
+                    event.auctionId(),
+                    AuctionEventType.AUCTION_WINNER_DECLARED,
+                    winnerPayload,
+                    OutboxStatus.NEW
+            ));
+
+            log.info("AUCTION_CLOSED – winner queued for declaration | auctionId={} | winner={} | price={}",
+                    event.auctionId(), bid.getUserId(), bid.getAmount());
+
+        }, () -> log.warn("AUCTION_CLOSED – no bids, no winner | auctionId={}", event.auctionId()));
     }
 
     private void handleAuctionWinnerDeclared(AuctionEventDTO event) {

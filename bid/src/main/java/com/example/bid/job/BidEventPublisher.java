@@ -15,7 +15,7 @@ public class BidEventPublisher {
     }
 
     public void publish(BidOutboxEventEntity event) {
-        AuctionEventDTO auctionEvent = new AuctionEventDTO(
+        AuctionEventDTO envelope = new AuctionEventDTO(
                 event.getEventId(),
                 event.getEventType(),
                 event.getAuctionId(),
@@ -23,7 +23,12 @@ public class BidEventPublisher {
                 event.getPayload()
         );
 
-        String routingKey = "auction.highest.bid";
-        rabbitTemplate.convertAndSend(EXCHANGE, routingKey, auctionEvent);
+        String routingKey = switch (event.getEventType()) {
+            case HIGHEST_BID_UPDATED     -> "auction.highest.bid";
+            case AUCTION_WINNER_DECLARED -> "auction.winner";
+            default -> throw new IllegalArgumentException("Unhandled event type: " + event.getEventType());
+        };
+
+        rabbitTemplate.convertAndSend(EXCHANGE, routingKey, envelope);
     }
 }

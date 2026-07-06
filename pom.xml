@@ -21,6 +21,7 @@
 		<module>GatewayApplication</module>
 		<module>EurekaServer</module>
 		<module>realtime-service</module>
+		<module>chat</module>
 	</modules>
 
 	<build>
